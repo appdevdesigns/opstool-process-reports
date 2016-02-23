@@ -83,8 +83,11 @@ steal(
 
 								_this.data.list.forEach(function (rpTemplate) {
 									if (rpTemplate.getID() === reportTemplate.getID()) {
+										
 										rpTemplate.attr('title', reportTemplate.title);
 										rpTemplate.attr('report_def', reportTemplate.report_def);
+										
+										_this.controllers.ReportTemplatesList.updateReportTemplate(rpTemplate);
 										isNewItem = false;
 									}
 								})
@@ -93,9 +96,6 @@ steal(
 									_this.data.list.push(reportTemplate);
 									_this.controllers.ReportTemplatesList.setList(_this.data.list);
 									_this.controllers.ReportTemplatesList.selectReportTemplate(reportTemplate);
-								}
-								else {
-									_this.controllers.ReportTemplatesList.setList(_this.data.list);
 								}
 
 							});

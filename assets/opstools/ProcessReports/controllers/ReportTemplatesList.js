@@ -50,10 +50,8 @@ steal(
 
 
 						setList: function (list) {
-							var _this = this;
-
 							this.data.attr('listReportTemplates', list);
-                    
+
 							// TODO : Lock selected items
 							// Unable selected items
 							// 							this.TRRequest.wholock(function (err, result) {
@@ -85,6 +83,8 @@ steal(
 							}
 						},
 
+
+
 						selectLI: function ($el) {
 							this.clearSelectItems();
 
@@ -109,6 +109,17 @@ steal(
 							}
 
 							this.element.find('.active').removeClass('active');
+						},
+
+
+
+						updateReportTemplate: function(reportTemplate) {
+							this.data.listReportTemplates.forEach(function(rpTemplate) {
+								if (rpTemplate.getID() === reportTemplate.getID()) {
+									rpTemplate.attr('title', reportTemplate.attr('title'));
+									rpTemplate.attr('report_def', reportTemplate.attr('report_def'));
+								}
+							})
 						},
 
 
