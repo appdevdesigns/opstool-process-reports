@@ -73,6 +73,18 @@ steal(
 							// }
 						},
 
+						selectReportTemplate: function (reportTemplate) {
+							var _this = this;
+							var menuItems = this.element.find('.op-list li');
+							for (var i = 0; i < menuItems.length; i++) {
+								var item = $(menuItems[i]);
+								if (item.data('item').getID() === reportTemplate.getID()) {
+									_this.selectLI(item);
+									break;
+								}
+							}
+						},
+
 						selectLI: function ($el) {
 							this.clearSelectItems();
 

@@ -80,20 +80,24 @@ steal(
 
 							this.controllers.ReportTemplateWorkspace.element.on(this.CONST.ITEM_SAVED, function (event, reportTemplate) {
 								var isNewItem = true;
-								
+
 								_this.data.list.forEach(function (rpTemplate) {
 									if (rpTemplate.getID() === reportTemplate.getID()) {
-										rpTemplate.title = reportTemplate.title;
-										rpTemplate.report_def = reportTemplate.report_def;
+										rpTemplate.attr('title', reportTemplate.title);
+										rpTemplate.attr('report_def', reportTemplate.report_def);
 										isNewItem = false;
 									}
 								})
 
 								if (isNewItem) {
 									_this.data.list.push(reportTemplate);
+									_this.controllers.ReportTemplatesList.setList(_this.data.list);
+									_this.controllers.ReportTemplatesList.selectReportTemplate(reportTemplate);
+								}
+								else {
+									_this.controllers.ReportTemplatesList.setList(_this.data.list);
 								}
 
-								_this.controllers.ReportTemplatesList.setList(_this.data.list);
 							});
 
 							this.controllers.ReportTemplateWorkspace.element.on(this.CONST.CLEAR_ITEM_SELECTED, function (event) {
