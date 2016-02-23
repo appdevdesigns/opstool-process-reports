@@ -17,8 +17,8 @@ module.exports = {
 
 		images: { type: 'json' },
 
-// report_def: { type: 'json', required: true }
-// Workaround: Canjs saves same format value 
+		// report_def: { type: 'json', required: true }
+		// Workaround: Canjs saves same format value 
 		report_def: { type: 'text', required: true }
 	}
 };

@@ -83,11 +83,6 @@ steal(
 
 								_this.data.list.forEach(function (rpTemplate) {
 									if (rpTemplate.getID() === reportTemplate.getID()) {
-										
-										rpTemplate.attr('title', reportTemplate.title);
-										rpTemplate.attr('report_def', reportTemplate.report_def);
-										
-										_this.controllers.ReportTemplatesList.updateReportTemplate(rpTemplate);
 										isNewItem = false;
 									}
 								})
@@ -102,6 +97,11 @@ steal(
 
 							this.controllers.ReportTemplateWorkspace.element.on(this.CONST.CLEAR_ITEM_SELECTED, function (event) {
 								_this.controllers.ReportTemplatesList.clearSelectItems();
+							});
+
+							AD.comm.socket.subscribe('RPReportDefinition', function (message, data) {
+								if (data.verb === 'created' || data.verb === 'updated' || data.verb === 'destroyed')
+									_this.loadReportTemplatesData();
 							});
 						},
 
