@@ -4,7 +4,8 @@ steal(
 		System.import('appdev').then(function () {
 			steal.import(
 				'appdev/ad',
-				'appdev/control/control'
+				'appdev/control/control',
+				'appdev/model/model'
 				).then(function () {
 			
 					// Namespacing conventions:
@@ -24,6 +25,18 @@ steal(
 
 
 							this.dataSource = this.options.dataSource; // AD.models.Projects;
+
+							this.RPReportDefinition = AD.Model.get('opstools.ProcessReports.RPReportDefinition');
+							
+							// Bind Lock/Unlock items 
+							this.RPReportDefinition.on('messaged', function (ev, data) {
+								var foundEL = self.element.find('[rp-report-template-id="' + data.id + '"]');
+								if (data.data.locked) {
+									foundEL.addClass('rpreport-locked');
+								} else {
+									foundEL.removeClass('rpreport-locked');
+								}
+							});
 
 							this.data = new can.Map({
 								listReportTemplates: new can.List([]),
@@ -50,25 +63,26 @@ steal(
 
 
 						setList: function (list) {
+							var _this = this;
+
 							this.data.attr('listReportTemplates', list);
 
-							// TODO : Lock selected items
 							// Unable selected items
-							// 							this.TRRequest.wholock(function (err, result) {
-							// 								if (err) return;
-							// 
-							// 								result.forEach(function (lockedId) {
-							// 									if (_this.data.selectedItem.getID() !== lockedId) {
-							// 										var foundEL = _this.element.find('[trrequest-id="' + lockedId + '"]');
-							// 										foundEL.addClass('trrequest-locked');
-							// 									}
-							// 								});
-							// 							});
+							this.RPReportDefinition.wholock(function (err, result) {
+								if (err) return;
 
-							// TODO : Resize screen
-							// if (this.data.screenHeight) {
-							// 	this.resize(this.data.screenHeight);
-							// }
+								result.forEach(function (lockedId) {
+									if (!_this.data.selectedItem || _this.data.selectedItem.getID() !== lockedId) {
+										var foundEL = _this.element.find('[rp-report-template-id="' + lockedId + '"]');
+										foundEL.addClass('rpreport-locked');
+									}
+								});
+							});
+
+							// Resize screen
+							if (this.data.screenHeight) {
+								this.resize(this.data.screenHeight);
+							}
 						},
 
 						selectReportTemplate: function (reportTemplate) {
@@ -93,9 +107,8 @@ steal(
 							var model = $el.data('item');
 							this.data.selectedItem = model;
 
-							// TODO
 							// lock the newly selected model:
-							// this.data.selectedItem.lock();
+							this.data.selectedItem.lock();
 
 							this.element.trigger(this.options.eventItemSelected, model);
 						},
@@ -104,7 +117,7 @@ steal(
 
 						clearSelectItems: function () {
 							if (this.data.selectedItem) {
-								// this.data.selectedItem.unlock();
+								this.data.selectedItem.unlock();
 								this.data.selectedItem = null;
 							}
 
@@ -113,8 +126,8 @@ steal(
 
 
 
-						updateReportTemplate: function(reportTemplate) {
-							this.data.listReportTemplates.forEach(function(rpTemplate) {
+						updateReportTemplate: function (reportTemplate) {
+							this.data.listReportTemplates.forEach(function (rpTemplate) {
 								if (rpTemplate.getID() === reportTemplate.getID()) {
 									rpTemplate.attr('title', reportTemplate.attr('title'));
 									rpTemplate.attr('report_def', reportTemplate.attr('report_def'));
@@ -135,9 +148,9 @@ steal(
 
 
 						'li click': function ($el, ev) {
-							// if (!$el.hasClass('trrequest-locked') && !$el.hasClass('active')) {
-							this.selectLI($el);
-							// }
+							if (!$el.hasClass('rpreport-locked') && !$el.hasClass('active')) {
+								this.selectLI($el);
+							}
 
 							ev.preventDefault();
 						}

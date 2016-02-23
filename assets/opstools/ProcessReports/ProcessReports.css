@@ -3,6 +3,11 @@
 	padding-left: 0px !important;
 }
 
+li.rpreport-locked { 
+    background-color: #777777; 
+    opacity: 0.2 !important;
+}
+
 .rp-report-title {
 	padding-left: 20px;
 	margin-top: 5px;

@@ -9,6 +9,10 @@ steal(
 					// Namespacing conventions:
 					// AD.Model.extend('[application].[Model]', {static}, {instance} );  --> Object
 					AD.Model.extend('opstools.ProcessReports.RPReportDefinition', {
+						useSockets: true,
+						wholock: function (cb) {
+							return AD.comm.service.get({ url: '/opstool-process-reports/rpreportdefinition/wholock' }, cb);
+						} 
 						/*
 								findAll: 'GET /opstool-process-reports/rpreportdefinition',
 								findOne: 'GET /opstool-process-reports/rpreportdefinition/{id}',
@@ -20,6 +24,13 @@ steal(
 								fieldLabel:'null'      // which field is considered the Label
 						*/
 					}, {
+							lock: function () {
+								return AD.comm.socket.get({ url: '/opstool-process-reports/rpreportdefinition/lock/' + this.getID() });
+							},
+
+							unlock: function () {
+								return AD.comm.socket.get({ url: '/opstool-process-reports/rpreportdefinition/unlock/' + this.getID() });
+							}
 							/*
 									// Already Defined:
 									model: function() {},   // returns the Model Class for an instance
