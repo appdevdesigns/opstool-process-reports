@@ -1,0 +1,35 @@
+{
+    "name": "opstool-process-reports",
+    "version": "1.0.0",
+    "description": "a cool project",
+    "main": "module.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "make test",
+        "postinstall": "node setup/setup.js",
+        "postupdate": "node setup/setup.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/wongpratan/opstool-process-reports.git"
+    },
+    "author": "Pong",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/wongpratan/opstool-process-reports/issues"
+    },
+    "homepage": "https://github.com/wongpratan/opstool-process-reports#readme",
+    "dependencies": {
+        "ad-utils": "appdevdesigns/ad-utils#develop"
+    },
+    "devDependencies": {
+        "barrels": "^1.6.4",
+        "chai": "^3.5.0",
+        "mocha": "^2.4.5",
+        "mocha-phantomjs": "^4.0.2",
+        "phantomjs": "^1.9.7-15",
+        "supertest": "^1.2.0"
+    }
+}

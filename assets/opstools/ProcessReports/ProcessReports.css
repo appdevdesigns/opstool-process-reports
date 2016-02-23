@@ -1,0 +1,14 @@
+/*  Add any css definitions for your project here */
+.col-xs-2, col-xs-10 {
+	padding-left: 0px !important;
+}
+
+.rp-report-title {
+	padding-left: 20px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.rp-report-title input {
+	width: 400px;
+}

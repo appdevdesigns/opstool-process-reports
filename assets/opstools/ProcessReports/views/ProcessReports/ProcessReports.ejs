@@ -1,0 +1,62 @@
+<!-- Widget -->
+
+<div class='col-xs-2 op-container'>
+	<!--Left bar-->
+	<div class="op-container op-widget sticky rp-reportlist">
+		<div class="op-widget-masthead">
+			<h3><strong app-label-key="rp.reportlist.header">Report Templates</strong></h3>
+			<p app-label-key="rp.reportlist.description">Choose one of the report template to review</p>
+		</div>
+		<div class="op-widget-body">
+			<ul class="op-list">
+				<!-- 
+                          data.attr('listReportTemplates').each(function(item) { 
+
+                            var active = '';
+                            if (data.selectedItem && data.selectedItem.getID() == item.getID()) {
+                              active = 'active';
+                            }
+
+                          -->
+				<li mockup-show="new-activity" class="op-container selected [[= active ]]" trrequest-id="[[= item.getID() ]]" obj-embed="item">
+					<div><i class="fa fa-file-text"></i> <strong>[[= item.title ]]</strong></div>
+				</li>
+				<!--
+                    });
+                    -->
+			</ul>
+		</div>
+	</div>
+	<!--/Left bar-->
+</div>
+
+<!-- Main stage area -->
+<div class='col-xs-10'>
+	<div class="rp-reportworkspace op-container">
+		<div class="mockup-display new-activity opsportal-content-area rp-instructionsPanel">
+			<p app-label-key="rp.instruction.selectOne"> Select an entry on the left to begin editing or
+				<button rp-status="create" app-label-key="rpreport.buttons.create" class="rp-reporttemplate-create btn-info"
+				type="submit">Create new report</button>
+			</p>
+		</div>
+
+		<div class="rp-template-form op-widget">
+			<div class="rp-report-title">
+				Report name:
+				<input value="[[= title ]]" class="rp-report-title-value" type="text" />
+			</div>
+
+			<div class="rp-report-designer op-widget-body">
+			</div>
+
+			<div class="rp-reporttemplate-button pull-right op-container nobgcolor op-margin-top">
+				<button rp-status="cancel" app-label-key="rpreport.buttons.cancel" class="rp-reporttemplate-submit btn btn-warning offset-15"
+				type="submit">Cancel</button>
+				<button rp-status="save" app-label-key="rpreport.buttons.save" class="rp-reporttemplate-submit btn btn-success offset-15"
+				type="submit"><i class="fa"></i>Save</button>
+				<button rp-status="delete" app-label-key="rpreport.buttons.delete" class="rp-reporttemplate-submit btn btn-danger" type="submit"><i class="fa"></i>Delete</button>
+			</div>
+		</div>
+
+	</div>
+</div>
