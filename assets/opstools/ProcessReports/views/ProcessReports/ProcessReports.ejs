@@ -33,10 +33,9 @@
 <!-- Main stage area -->
 <div class='col-xs-10'>
 	<div class="rp-reportworkspace op-container">
-		<div class="mockup-display new-activity opsportal-content-area rp-instructionsPanel">
+		<div class="rp-instructionsPanel mockup-display new-activity opsportal-content-area">
 			<p app-label-key="rp.instruction.selectOne"> Select an entry on the left to begin editing or
-				<button rp-status="create" app-label-key="rpreport.buttons.create" class="rp-reporttemplate-create btn-info"
-				type="submit">Create new report</button>
+				<button rp-status="create" app-label-key="rpreport.buttons.create" class="rp-reporttemplate-create btn-info" type="submit">Create new report</button>
 			</p>
 		</div>
 
@@ -44,6 +43,9 @@
 			<div class="rp-report-title">
 				Report name:
 				<input value="[[= title ]]" class="rp-report-title-value" type="text" />
+
+
+				<button app-label-key="rpreport.buttons.preview" class="rp-reporttemplate-preview btn btn-info pull-right" type="submit">Preview</button>
 			</div>
 
 			<div class="rp-report-designer op-widget-body">
@@ -58,5 +60,19 @@
 			</div>
 		</div>
 
+		<div class="rp-template-preview modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-body" style="height: 500px;">
+						<div class="rp-report-preview" style="height: 500px;">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
 	</div>
 </div>

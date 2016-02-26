@@ -1,5 +1,6 @@
 [
 	{
+		"id": 1,
 		"name": "Test Data Source",
 		"schema": {
 			"fields": [
