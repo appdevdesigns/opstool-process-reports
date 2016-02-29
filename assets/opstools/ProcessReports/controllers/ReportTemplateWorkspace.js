@@ -226,8 +226,21 @@ steal(
 									data_schema = ds.schema;
 							});
 
-							if (data_schema === null)
+							if (!data_schema || !data_schema.fields)
 								return; // TODO: show error message
+
+							// Mock data to display report preview
+							var data = {};
+							data_schema.fields.forEach(function (f) {
+								switch (f.type) {
+									case 'number':
+										data[f.name] = 9999;
+										break;
+									default:
+										data[f.name] = '[' + f.name + ']';
+										break;
+								}
+							});
 
 							// Render report preview
 							var report_previewer = jsreports.render({
@@ -237,31 +250,13 @@ steal(
 								datasets: [{
 									"id": report_def.body.data_source,
 									"name": report_def.body.data_source,
-									"data": [
-										{
-											"Entry_Date": "6/23/2015",
-											"Previous_timesheet_status": "open",
-											"Current_timesheet_status": "locked",
-											"Full_name": "Elizabeth Stewart",
-											"Employee_number": "na",
-											"Person_status": "Active",
-											"Employment_type": "Employee",
-											"Client_name": "Nakatomi Trading Corp.",
-											"Job_name": "Project Molybdenum",
-											"Hours": 2.25,
-											"Task_name": "Meeting",
-											"Billing_rate": "190",
-											"Cost": "10",
-											"Time_Entry_ID": "1854509",
-											"Timesheet_ID": "1498876",
-											"Person_ID": "100000003",
-											"Client_ID": "100000000",
-											"Job_ID": "100000001",
-											"Task_ID": "100000002"
-										}],
+									"data": [data],
 									"schema": data_schema
 								}]
 							});
+
+							// Fix report toolbar
+							$('.jsr-content-viewport').css('top', '40px');
 
 							// Show modal
 							this.dom.modalPreview.modal('show');
