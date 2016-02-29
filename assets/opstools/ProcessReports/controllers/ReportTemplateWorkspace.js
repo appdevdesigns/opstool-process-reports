@@ -233,6 +233,7 @@ steal(
 							var report_previewer = jsreports.render({
 								report_def: report_def,
 								target: this.element.find(".rp-report-preview"),
+								showToolbar: true,
 								datasets: [{
 									"id": report_def.body.data_source,
 									"name": report_def.body.data_source,

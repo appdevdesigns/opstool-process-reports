@@ -30,3 +30,10 @@ li.rpreport-locked {
 .rp-reporttemplate-button {
 	margin-right: 5px;
 }
+
+.rp-report-preview {
+	background: white;
+	border: 1px solid #ccc;
+	height: 570px;
+	width: 860px
+}
