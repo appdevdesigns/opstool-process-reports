@@ -123,7 +123,7 @@ steal(
 							this.data.screenHeight = height;
 
 							if (this.dom.FormWidget) {
-								this.dom.FormWidget.resize({ height: height - 95 });
+								this.dom.FormWidget.resize({ height: height - 105 });
 							}
 						},
 
