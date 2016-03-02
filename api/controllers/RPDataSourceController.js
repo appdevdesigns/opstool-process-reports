@@ -9,8 +9,8 @@ module.exports = {
 
     _config: {
         model: "rpdatasource", // all lowercase model name
-        actions: true,
-        shortcuts: true,
+        actions: false,
+        shortcuts: false,
         rest: true
     }
 	

@@ -211,12 +211,13 @@ steal(
 
 							this.setReportTemplate(this.RPReportDefinition.extend({
 								title: 'New report',
-								report_def: '{"title":"New report","id":"","default_format":"html","version":"1.4.0","page":{"units":"inches","paper_size":{"name":"Letter","inches":["8.5","11"],"mm":["216","279"],"id":"letter"},"margins":{"top":0.5,"left":0.5,"right":0.5,"bottom":0.5}},"filters":[],"inputs":[],"header":{"height":1.15,"elements":[]},"body":{"data_source":"","show_detail":true,"height":0.35,"elements":[],"sublevels":[],"column_count":1,"pivot_enabled":false,"pivot_expression":"","pivot_column_sort_by":"","pivot_column_bucket_type":"","pivot_value_aggregate":"","order_detail_by":"Entry_Date","pivot_column_left":3.325,"pivot_column_right":4.175,"pivot_area_right":5.449999999999999},"footer":{"height":0,"elements":[]},"page_header":{"visible":false,"elements":[],"height":1},"page_footer":{"visible":false,"elements":[],"height":1},"type":"hierarchical"}'
+								report_def: '{"title":"New report","id":"","default_format":"html","version":"1.4.0","page":{"units":"inches","paper_size":{"name":"A4","inches":["8.27","11.69"],"mm":["210","297"],"id":"a4"},"margins":{"top":0.5,"left":0.5,"right":0.5,"bottom":0.5}},"filters":[],"inputs":[],"header":{"height":1.15,"elements":[]},"body":{"data_source":"","show_detail":true,"height":0.35,"elements":[],"sublevels":[],"column_count":1,"pivot_enabled":false,"pivot_expression":"","pivot_column_sort_by":"","pivot_column_bucket_type":"","pivot_value_aggregate":"","pivot_column_left":3.325,"pivot_column_right":4.175,"pivot_area_right":5.449999999999999},"footer":{"height":0,"elements":[]},"page_header":{"visible":false,"elements":[],"height":1},"page_footer":{"visible":false,"elements":[],"height":1},"type":"hierarchical"}'
 							})());
 						},
 
 						// Preview button in the edit page 
 						'.rp-reporttemplate-preview click': function () {
+
 							var report_def = this.dom.designer.getReport();
 
 							// Find data source schema
@@ -226,8 +227,10 @@ steal(
 									data_schema = ds.schema;
 							});
 
-							if (!data_schema || !data_schema.fields)
-								return; // TODO: show error message
+							if (!data_schema || !data_schema.fields) {
+								alert('Please select the data source');
+								return;
+							}
 
 							// Mock data to display report preview
 							var data = {};
