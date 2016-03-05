@@ -87,14 +87,14 @@ steal(
 								container: this.element.find(".rp-report-designer"),
 								embedded: true,
 								showToolbar: true, // If false, it shows overlap UI
-								showSaveButton: false,
+								showSaveButton: true,
 								data_sources: this.data.dataSources,
 								images: this.data.reportTemplate.images,
 								report_def: report_def,
 								layout: "horizontal"
 							});
 
-							$('.jsr-designer-toolbar').remove(); // Fix overlap report UI layout
+							// $('.jsr-designer-toolbar').remove(); // Fix overlap report UI layout
 
 							this.element.find('.rp-report-title').html(can.view('RP_TitleForm', { title: this.data.reportTemplate.title }));
 
@@ -170,7 +170,10 @@ steal(
 										// Workaround : Convert report_def to string
 										var report_def = JSON.stringify(this.dom.designer.getReport());
 
-										this.data.reportTemplate.attr('title', this.element.find('.rp-report-title-value').val());
+										var title = this.element.find('.rp-report-title-value').val();
+										this.data.reportTemplate.attr('title', title);
+										report_def.title = title;
+										
 										// TODO : save images field
 										this.data.reportTemplate.attr('report_def', report_def);
 
@@ -218,6 +221,7 @@ steal(
 						// Preview button in the edit page 
 						'.rp-reporttemplate-preview click': function () {
 
+							var _this = this;
 							var report_def = this.dom.designer.getReport();
 
 							// Find data source schema
@@ -234,36 +238,108 @@ steal(
 
 							// Mock data to display report preview
 							var data = {};
-							data_schema.fields.forEach(function (f) {
-								switch (f.type) {
-									case 'number':
-										data[f.name] = 9999;
-										break;
-									default:
-										data[f.name] = '[' + f.name + ']';
-										break;
+							// data_schema.fields.forEach(function (f) {
+							// 	switch (f.type) {
+							// 		case 'number':
+							// 			data[f.name] = 9999;
+							// 			break;
+							// 		default:
+							// 			data[f.name] = '[' + f.name + ']';
+							// 			break;
+							// 	}
+							// });
+							AD.comm.service.get({ url: '/fcf_activities/renderreport/activities?personId=' + 230 }, function (err, result) {
+								data = result;
+								
+								var report = jsreports.createReport(report_def)
+									.header(null, report_def.header)
+									.detail(report_def.body.height)
+									.table(0.2745228215767635, 2.562213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
+									.column('5%', '[order]', 'Order', '', {  align: 'left' })
+									.column('95%', '[title]', 'Activity title', '', {  align: 'left' })
+									.footer(null, report_def.footer)
+									.done();
+
+								// Render report preview
+								var report_previewer = jsreports.render({
+									report_def: report,
+									target: _this.element.find(".rp-report-preview"),
+									showToolbar: true,
+									datasets: [{
+										"id": report_def.body.data_source,
+										"name": report_def.body.data_source,
+										"data": [data],
+										"schema": data_schema
+									}]
+								});
+
+								// Fix report toolbar
+								$('.jsr-content-viewport').css('top', '40px');
+
+								// Add export HTML report format menu
+								$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html">HTML</a></li>');
+
+								$('.jsr-export-html').bind('click', function () {
+									// Get report html format
+									var html = _this.getReportHtml();
+
+									// Download the report html file
+									var downloadReportHtml = $(document.createElement('a'));
+									downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
+									downloadReportHtml.attr('download', report_def.title + '.htm');
+									downloadReportHtml[0].click();
+								});
+
+								// Show modal
+								_this.dom.modalPreview.modal('show');
+							});
+						},
+
+						getReportHtml: function () {
+							var selector = '.jsr-content-viewport';
+							var html = '<div class="jsr-report">' + $(selector).html() + '</div>';
+
+							selector = selector.split(",").map(function (subselector) {
+								return subselector + "," + subselector + " *";
+							}).join(",");
+
+							var elts = $(selector);
+							var rulesUsed = [];
+							var sheets = document.styleSheets;
+
+							for (var c = 0; c < sheets.length; c++) {
+								var rules = sheets[c].rules || sheets[c].cssRules;
+								for (var r = 0; r < rules.length; r++) {
+									var selectorText = rules[r].selectorText;
+									var matchedElts = $(selectorText);
+									for (var i = 0; i < elts.length; i++) {
+										if (matchedElts.index(elts[i]) != -1) {
+											rulesUsed.push(rules[r]); break;
+										}
+									}
 								}
-							});
+							}
 
-							// Render report preview
-							var report_previewer = jsreports.render({
-								report_def: report_def,
-								target: this.element.find(".rp-report-preview"),
-								showToolbar: true,
-								datasets: [{
-									"id": report_def.body.data_source,
-									"name": report_def.body.data_source,
-									"data": [data],
-									"schema": data_schema
-								}]
-							});
+							var style = rulesUsed.map(function (cssRule) {
+								var cssText = '';
+								if (cssRule.style) {
+									cssText = cssRule.style.cssText.toLowerCase();
+								} else {
+									cssText = cssRule.cssText;
+								}
 
-							// Fix report toolbar
-							$('.jsr-content-viewport').css('top', '40px');
+								return cssRule.selectorText + '{' + cssText.replace(/(\{|;)\s+/g, "\$1\n  ").replace(/\A\s+}/, "}") + '}';
+							}).join("\n");
 
-							// Show modal
-							this.dom.modalPreview.modal('show');
+							return "<html><head><meta charset='UTF-8'><style>\n" + style + "\n</style></head>\n\n<body>" + html + "</body></html>";
+						},
+
+						'.rp-test-get-real-data click': function () {
+							AD.comm.service.get({ url: '/fcf_activities/renderreport/activities?personId=' + 230 }, function (err, data) {
+								console.log('data: ', data);
+							})
 						}
+
 
 
 					});

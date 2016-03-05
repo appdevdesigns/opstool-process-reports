@@ -16,7 +16,9 @@ module.exports = {
 
     schema : { type: 'json', required: true },
 
-    permissions : { type: 'json' }
+    permissions : { type: 'json' },
+
+	getDataUrl : { type: 'string' }
   }
 };
 

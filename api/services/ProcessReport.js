@@ -22,12 +22,13 @@ module.exports = {
 	 *										It should have the following properties:
 	 *						.name {string}  the label for the datasource (multilingual???)
 	 *						.schema {json}  the schema for this DS
-	 * @param {array} permissions  An array of action keys required to have
-	 *							   access to this datasource.
+	 * @param {array} permissions  			An array of action keys required to have
+	 *							   			access to this datasource.
+	 * @param {string} getDataUrl  			The get data url to render report.
 	 *
 	 * @return {deferred} 
 	 */
-	addDataSource: function (dataSourceDefinition, permissions) {
+	addDataSource: function (dataSourceDefinition, permissions, getDataUrl) {
 		var dfd = AD.sal.Deferred();
 
 		// Validate required fields
@@ -61,7 +62,8 @@ module.exports = {
 			RPDataSource.create({
 				name: dataSourceDefinition.name,
 				schema: dataSourceDefinition.schema,
-				permissions: permissions || []
+				permissions: permissions || [],
+				getDataUrl: getDataUrl
 			}).fail(function (err) {
 				dfd.fail(err);
 			}).then(function () {

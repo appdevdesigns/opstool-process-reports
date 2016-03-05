@@ -5,39 +5,70 @@
 		"schema": {
 			"fields": [
 				{
-					"name": "date_start",
-					"type": "date",
-					"dateFormat": "M/D/YYYY"
-				},
-				{
-					"name": "date_end",
-					"type": "date",
-					"dateFormat": "M/D/YYYY"
-				},
-				{
-					"name": "default_image",
+					"name": "person_name",
 					"type": "string"
 				},
 				{
-					"name": "team",
+					"name": "person_age",
+					"type": "number"
+				},
+				{
+					"name": "person_nationality",
 					"type": "string"
 				},
 				{
-					"name": "createdBy",
+					"name": "person_passport_number",
 					"type": "string"
 				},
 				{
-					"name": "approvedBy",
+					"name": "person_work_address",
 					"type": "string"
 				},
 				{
-					"name": "status",
+					"name": "person_home_address",
+					"type": "string"
+				},
+				{
+					"name": "person_visa_start_date",
+					"type": "date"
+				},
+				{
+					"name": "person_visa_expire_date",
+					"type": "date"
+				},
+				{
+					"name": "person_job_title",
+					"type": "string"
+				},
+				{
+					"name": "person_job_description",
+					"type": "string"
+				},
+				{
+					"name": "person_activites",
+					"type": "string"
+				},
+				{
+					"name": "organization_name",
+					"type": "string"
+				},
+				{
+					"name": "organization_chief_name",
+					"type": "string"
+				},
+				{
+					"name": "organization_chief_position",
+					"type": "string"
+				},
+				{
+					"name": "workplace_name",
 					"type": "string"
 				}
 			]
 		},
 		"permissions": [
 			"fcf.activities"
-		]
+		],
+		"getDataUrl": "/fcf_activities/renderreport/activities"
 	}
 ]
