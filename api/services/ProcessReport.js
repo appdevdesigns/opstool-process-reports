@@ -57,17 +57,40 @@ module.exports = {
             dfd.fail('Please enter required fields');
 
         } else {
-
-			// Create new data source
-			RPDataSource.create({
-				name: dataSourceDefinition.name,
-				schema: dataSourceDefinition.schema,
-				permissions: permissions || [],
-				getDataUrl: getDataUrl
-			}).fail(function (err) {
-				dfd.fail(err);
-			}).then(function () {
-				dfd.resolve();
+			RPDataSource.findOne({
+				name: dataSourceDefinition.name
+			}, function (err, result) {
+				if (result) {
+					// Update exists data source
+					RPDataSource.update(
+						{
+							name: dataSourceDefinition.name
+						},
+						{
+							name: dataSourceDefinition.name,
+							schema: dataSourceDefinition.schema,
+							permissions: permissions || [],
+							getDataUrl: getDataUrl
+						}).fail(function (err) {
+							dfd.fail(err);
+						}).then(function () {
+							dfd.resolve();
+						});
+				}
+				else {
+					// Create new data source
+					RPDataSource.create(
+						{
+							name: dataSourceDefinition.name,
+							schema: dataSourceDefinition.schema,
+							permissions: permissions || [],
+							getDataUrl: getDataUrl
+						}).fail(function (err) {
+							dfd.fail(err);
+						}).then(function () {
+							dfd.resolve();
+						});
+				}
 			});
 		}
 
