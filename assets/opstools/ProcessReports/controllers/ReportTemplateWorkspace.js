@@ -89,7 +89,7 @@ steal(
 								showToolbar: true, // If false, it shows overlap UI
 								showSaveButton: true,
 								data_sources: this.data.dataSources,
-								images: this.data.reportTemplate.images,
+								images: this.data.reportTemplate.images || [],
 								report_def: report_def,
 								layout: "horizontal"
 							});
@@ -332,15 +332,7 @@ steal(
 							}).join("\n");
 
 							return "<html><head><meta charset='UTF-8'><style>\n" + style + "\n</style></head>\n\n<body>" + html + "</body></html>";
-						},
-
-						'.rp-test-get-real-data click': function () {
-							AD.comm.service.get({ url: '/fcf_activities/renderreport/activities?personId=' + 230 }, function (err, data) {
-								console.log('data: ', data);
-							})
 						}
-
-
 
 					});
 
