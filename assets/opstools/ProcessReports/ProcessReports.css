@@ -3,6 +3,16 @@
 	padding-left: 0px !important;
 }
 
+.op-widget-footer {
+	background-color: #1F6B8D;
+	text-align: center;
+}
+
+.rp-reporttemplate-list-create {
+	margin-top: 5px;
+	width: 95%;
+}
+
 li.rpreport-locked { 
     background-color: #777777; 
     opacity: 0.2 !important;

@@ -20,7 +20,8 @@ steal(
 						CONST: {
 							ITEM_SELECTED: 'RP_ReportTemplate.Selected',
 							ITEM_SAVED: 'RP_ReportTemplate.Saved',
-							CLEAR_ITEM_SELECTED: 'RP_ReportTemplate.ClearSelected'
+							CLEAR_ITEM_SELECTED: 'RP_ReportTemplate.ClearSelected',
+							CLICK_CREATE_REPORT: 'RP_ReportTemplate.CreateClicked'
 						},
 
 
@@ -65,8 +66,22 @@ steal(
 							var ReportTemplatesList = AD.Control.get('opstools.ProcessReports.ReportTemplatesList');
 							var ReportTemplateWorkspace = AD.Control.get('opstools.ProcessReports.ReportTemplateWorkspace');
 
-							this.controllers.ReportTemplatesList = new ReportTemplatesList(this.element.find('.rp-reportlist'), { eventItemSelected: this.CONST.ITEM_SELECTED });
-							this.controllers.ReportTemplateWorkspace = new ReportTemplateWorkspace(this.element.find('.rp-reportworkspace'), { eventItemSaved: this.CONST.ITEM_SAVED, eventClearItemSelected: this.CONST.CLEAR_ITEM_SELECTED });
+							this.controllers.ReportTemplatesList = new ReportTemplatesList(
+								this.element.find('.rp-reportlist'),
+								{
+									eventItemSelected: this.CONST.ITEM_SELECTED,
+									eventCreateReport: this.CONST.CLICK_CREATE_REPORT
+								}
+								);
+
+							this.controllers.ReportTemplateWorkspace = new ReportTemplateWorkspace(
+								this.element.find('.rp-reportworkspace'),
+								{
+									eventItemSaved: this.CONST.ITEM_SAVED,
+									eventClearItemSelected: this.CONST.CLEAR_ITEM_SELECTED
+								}
+								);
+
 						},
 
 
@@ -76,6 +91,10 @@ steal(
 
 							this.controllers.ReportTemplatesList.element.on(this.CONST.ITEM_SELECTED, function (event, reportTemplate) {
 								_this.controllers.ReportTemplateWorkspace.setReportTemplate(reportTemplate);
+							});
+
+							this.controllers.ReportTemplatesList.element.on(this.CONST.CLICK_CREATE_REPORT, function (event, reportTemplate) {
+								_this.controllers.ReportTemplateWorkspace.prepareWorkspaceToCreate();
 							});
 
 							this.controllers.ReportTemplateWorkspace.element.on(this.CONST.ITEM_SAVED, function (event, reportTemplate) {

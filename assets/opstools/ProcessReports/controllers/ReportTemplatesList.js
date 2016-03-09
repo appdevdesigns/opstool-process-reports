@@ -16,7 +16,8 @@ steal(
 						init: function (element, options) {
 							var self = this;
 							options = AD.defaults({
-								eventItemSelected: 'RP_ReportTemplate.Selected'
+								eventItemSelected: 'RP_ReportTemplate.Selected',
+								eventCreateReport: 'RP_ReportTemplate.CreateClicked'
 							}, options);
 							this.options = options;
 
@@ -111,6 +112,10 @@ steal(
 							this.data.selectedItem.lock();
 
 							this.element.trigger(this.options.eventItemSelected, model);
+
+							if (this.data.screenHeight) {
+								this.resize(this.data.screenHeight);
+							}
 						},
 
 
@@ -153,6 +158,21 @@ steal(
 							}
 
 							ev.preventDefault();
+						},
+
+						'.rp-reporttemplate-list-create click': function ($el, ev) {
+							var _this = this;
+
+							if (this.data.selectedItem) {
+								AD.op.Dialog.Confirm({
+									fnYes: function () {
+										_this.element.trigger(_this.options.eventCreateReport);
+									}
+								});
+							}
+							else {
+								_this.element.trigger(_this.options.eventCreateReport);
+							}
 						}
 
 					});

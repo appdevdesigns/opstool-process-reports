@@ -107,6 +107,15 @@ steal(
 						},
 
 
+						prepareWorkspaceToCreate: function () {
+							this.clearWorkspace();
+
+							this.setReportTemplate(this.RPReportDefinition.extend({
+								title: 'New report',
+								report_def: '{"title":"New report","id":"","default_format":"html","version":"1.4.0","page":{"units":"inches","paper_size":{"name":"A4","inches":["8.27","11.69"],"mm":["210","297"],"id":"a4"},"margins":{"top":0.5,"left":0.5,"right":0.5,"bottom":0.5}},"filters":[],"inputs":[],"header":{"height":1.15,"elements":[]},"body":{"data_source":"","show_detail":true,"height":0.35,"elements":[],"sublevels":[],"column_count":1,"pivot_enabled":false,"pivot_expression":"","pivot_column_sort_by":"","pivot_column_bucket_type":"","pivot_value_aggregate":"","pivot_column_left":3.325,"pivot_column_right":4.175,"pivot_area_right":5.449999999999999},"footer":{"height":0,"elements":[]},"page_header":{"visible":false,"elements":[],"height":1},"page_footer":{"visible":false,"elements":[],"height":1},"type":"hierarchical"}'
+							})());
+						},
+
 
 						clearWorkspace: function () {
 							this.dom.designer = null;
@@ -126,9 +135,6 @@ steal(
 								this.dom.FormWidget.resize({ height: height - 105 });
 							}
 						},
-
-
-
 						buttonsEnable: function () {
 							for (var b in this.buttons) {
 								if (this.buttons[b])
@@ -141,7 +147,6 @@ steal(
 									this.buttons[b].disable();
 							}
 						},
-
 
 
 						'.rp-reporttemplate-submit click': function ($btn) {
@@ -211,11 +216,7 @@ steal(
 
 						// Create button in the instruction page
 						'.rp-reporttemplate-create click': function () {
-
-							this.setReportTemplate(this.RPReportDefinition.extend({
-								title: 'New report',
-								report_def: '{"title":"New report","id":"","default_format":"html","version":"1.4.0","page":{"units":"inches","paper_size":{"name":"A4","inches":["8.27","11.69"],"mm":["210","297"],"id":"a4"},"margins":{"top":0.5,"left":0.5,"right":0.5,"bottom":0.5}},"filters":[],"inputs":[],"header":{"height":1.15,"elements":[]},"body":{"data_source":"","show_detail":true,"height":0.35,"elements":[],"sublevels":[],"column_count":1,"pivot_enabled":false,"pivot_expression":"","pivot_column_sort_by":"","pivot_column_bucket_type":"","pivot_value_aggregate":"","pivot_column_left":3.325,"pivot_column_right":4.175,"pivot_area_right":5.449999999999999},"footer":{"height":0,"elements":[]},"page_header":{"visible":false,"elements":[],"height":1},"page_footer":{"visible":false,"elements":[],"height":1},"type":"hierarchical"}'
-							})());
+							this.prepareWorkspaceToCreate();
 						},
 
 						// Preview button in the edit page 
