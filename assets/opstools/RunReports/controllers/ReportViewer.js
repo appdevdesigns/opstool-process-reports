@@ -32,7 +32,7 @@ steal(
 
 						initDOM: function () {
 							this.dom = {};
-							
+
 							this.dom.ViewWidget = new AD.op.Widget(this.element.find('.rp-runreport-preview'));
 						},
 
@@ -43,10 +43,12 @@ steal(
 							AD.comm.service.get({ url: '/fcf_activities/renderreport/activities' }, function (err, data) {
 								var report = jsreports.createReport(report_def)
 									.header(null, report_def.header)
+									.pageHeader(null, report_def.page_header)
 									.detail(report_def.body.height)
-									.table(0.2745228215767635, 2.562213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
+									.table(0.2745228215767635, 4.062213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
 									.column('5%', '[order]', 'Order', '', { align: 'left' })
 									.column('95%', '[title]', 'Activity title', '', { align: 'left' })
+									.pageFooter(null, report_def.page_footer)
 									.footer(null, report_def.footer)
 									.done();
 
@@ -63,12 +65,69 @@ steal(
 									}]
 								});
 
+
+								// Remove export PDF/Excel menu
+								$(".jsr-save-dropdown-button li[role='presentation']").remove();
+
+								// Add export HTML report format menu
+								$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html">HTML</a></li>');
+
+								$('.jsr-export-html').bind('click', function () {
+									// Get report html format
+									var html = _this.getReportHtml();
+
+									// Download the report html file
+									var downloadReportHtml = $(document.createElement('a'));
+									downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
+									downloadReportHtml.attr('download', report_def.title + '.htm');
+									downloadReportHtml[0].click();
+								});
+
 								_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.jsr-content-viewport'));
 
 								if (_this.data.screenHeight) {
 									_this.resize(_this.data.screenHeight);
 								}
 							});
+						},
+
+						getReportHtml: function () {
+							var selector = '.jsr-content-viewport';
+							var html = '<div class="jsr-report">' + $(selector).html() + '</div>';
+
+							selector = selector.split(",").map(function (subselector) {
+								return subselector + "," + subselector + " *";
+							}).join(",");
+
+							var elts = $(selector);
+							var rulesUsed = [];
+							var sheets = document.styleSheets;
+
+							for (var c = 0; c < sheets.length; c++) {
+								var rules = sheets[c].rules || sheets[c].cssRules;
+								for (var r = 0; r < rules.length; r++) {
+									var selectorText = rules[r].selectorText;
+									var matchedElts = $(selectorText);
+									for (var i = 0; i < elts.length; i++) {
+										if (matchedElts.index(elts[i]) != -1) {
+											rulesUsed.push(rules[r]); break;
+										}
+									}
+								}
+							}
+
+							var style = rulesUsed.map(function (cssRule) {
+								var cssText = '';
+								if (cssRule.style) {
+									cssText = cssRule.style.cssText.toLowerCase();
+								} else {
+									cssText = cssRule.cssText;
+								}
+
+								return cssRule.selectorText + '{' + cssText.replace(/(\{|;)\s+/g, "\$1\n  ").replace(/\A\s+}/, "}") + '}';
+							}).join("\n");
+
+							return "<html><head><meta charset='UTF-8'><style>\n" + style + "\n</style></head>\n\n<body>" + html + "</body></html>";
 						},
 
 						resize: function (height) {

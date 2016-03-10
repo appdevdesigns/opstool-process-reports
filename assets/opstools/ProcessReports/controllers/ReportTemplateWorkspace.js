@@ -252,15 +252,17 @@ steal(
 
 							var report = jsreports.createReport(report_def)
 								.header(null, report_def.header)
+								.pageHeader(null, report_def.page_header)
 								.detail(report_def.body.height)
-								.table(0.2745228215767635, 2.562213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
+								.table(0.2745228215767635, 4.062213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
 								.column('5%', '[order]', 'Order', '', { align: 'left' })
 								.column('95%', '[title]', 'Activity title', '', { align: 'left' })
+								.pageFooter(null, report_def.page_footer)
 								.footer(null, report_def.footer)
 								.done();
 
 							// Render report preview
-							var report_previewer = jsreports.render({
+							jsreports.render({
 								report_def: report,
 								target: _this.element.find(".rp-report-preview"),
 								showToolbar: true,
