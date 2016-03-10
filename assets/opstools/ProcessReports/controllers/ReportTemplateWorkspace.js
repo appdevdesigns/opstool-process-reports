@@ -239,64 +239,61 @@ steal(
 
 							// Mock data to display report preview
 							var data = {};
-							// data_schema.fields.forEach(function (f) {
-							// 	switch (f.type) {
-							// 		case 'number':
-							// 			data[f.name] = 9999;
-							// 			break;
-							// 		default:
-							// 			data[f.name] = '[' + f.name + ']';
-							// 			break;
-							// 	}
-							// });
-							AD.comm.service.get({ url: '/fcf_activities/renderreport/activities?personId=' + 230 }, function (err, result) {
-								data = result;
-
-								var report = jsreports.createReport(report_def)
-									.header(null, report_def.header)
-									.detail(report_def.body.height)
-									.table(0.2745228215767635, 2.562213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
-									.column('5%', '[order]', 'Order', '', { align: 'left' })
-									.column('95%', '[title]', 'Activity title', '', { align: 'left' })
-									.footer(null, report_def.footer)
-									.done();
-
-								// Render report preview
-								var report_previewer = jsreports.render({
-									report_def: report,
-									target: _this.element.find(".rp-report-preview"),
-									showToolbar: true,
-									datasets: [{
-										"id": report_def.body.data_source,
-										"name": report_def.body.data_source,
-										"data": [data],
-										"schema": data_schema
-									}]
-								});
-
-								// Fix report toolbar
-								$('.jsr-content-viewport').css('top', '40px');
-
-								// Remove export PDF/Excel menu
-								$(".jsr-save-dropdown-button li[role='presentation']").remove();
-
-								// Add export HTML report format menu
-								$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html">HTML</a></li>');
-
-								$('.jsr-export-html').bind('click', function () {
-									// Get report html format
-									var html = _this.getReportHtml();
-
-									// Download the report html file
-									var downloadReportHtml = $(document.createElement('a'));
-									downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
-									downloadReportHtml.attr('download', report_def.title + '.htm');
-									downloadReportHtml[0].click();
-								});
-
-								// Show modal
-								_this.dom.modalPreview.modal('show');
+							data_schema.fields.forEach(function (f) {
+								switch (f.type) {
+									case 'number':
+										data[f.name] = 9999;
+										break;
+									default:
+										data[f.name] = '[' + f.name + ']';
+										break;
+								}
 							});
+
+							var report = jsreports.createReport(report_def)
+								.header(null, report_def.header)
+								.detail(report_def.body.height)
+								.table(0.2745228215767635, 2.562213001383126, 7.289083895853422, 4.306460945033751, { data: 'person_activities', hasHeader: false, hasFooter: false, fontSize: 9 })
+								.column('5%', '[order]', 'Order', '', { align: 'left' })
+								.column('95%', '[title]', 'Activity title', '', { align: 'left' })
+								.footer(null, report_def.footer)
+								.done();
+
+							// Render report preview
+							var report_previewer = jsreports.render({
+								report_def: report,
+								target: _this.element.find(".rp-report-preview"),
+								showToolbar: true,
+								datasets: [{
+									"id": report_def.body.data_source,
+									"name": report_def.body.data_source,
+									"data": [data],
+									"schema": data_schema
+								}]
+							});
+
+							// Fix report toolbar
+							$('.jsr-content-viewport').css('top', '40px');
+
+							// Remove export PDF/Excel menu
+							$(".jsr-save-dropdown-button li[role='presentation']").remove();
+
+							// Add export HTML report format menu
+							$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html">HTML</a></li>');
+
+							$('.jsr-export-html').bind('click', function () {
+								// Get report html format
+								var html = _this.getReportHtml();
+
+								// Download the report html file
+								var downloadReportHtml = $(document.createElement('a'));
+								downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
+								downloadReportHtml.attr('download', report_def.title + '.htm');
+								downloadReportHtml[0].click();
+							});
+
+							// Show modal
+							_this.dom.modalPreview.modal('show');
 						},
 
 						getReportHtml: function () {

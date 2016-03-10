@@ -1,0 +1,8 @@
+
+/*  Add any css definitions for your project here */
+.rp-runreport-preview {
+	background: white;
+	border: 1px solid #ccc;
+	height: 570px;
+	overflow: hidden !important;
+}

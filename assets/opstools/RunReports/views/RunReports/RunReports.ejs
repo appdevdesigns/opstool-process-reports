@@ -1,0 +1,39 @@
+<!-- Widget -->
+
+<div class='col-xs-2 op-container'>
+	<!--Left bar-->
+	<div class="op-container op-widget sticky rp-runreport-list">
+		<div class="op-widget-masthead">
+			<h3><strong app-label-key="rp.runreportlist.header">Report Templates</strong></h3>
+			<p app-label-key="rp.runreportlist.description">Choose one of the report template to view</p>
+		</div>
+		<div class="op-widget-body">
+			<ul class="op-list">
+				<!-- 
+                          data.attr('runReportLists').each(function(item) { 
+
+                            var active = '';
+                            if (data.selectedItem && data.selectedItem.getID() == item.getID()) {
+                              active = 'active';
+                            }
+
+                          -->
+				<li mockup-show="new-activity" class="op-container selected [[= active ]]" rp-run-report-id="[[= item.getID() ]]" obj-embed="item">
+					<div><i class="fa fa-file-text"></i> <strong>[[= item.attr('title') ]]</strong></div>
+				</li>
+				<!--
+                    });
+                    -->
+			</ul>
+		</div>
+	</div>
+	<!--/Left bar-->
+</div>
+
+<!-- Main stage area -->
+<div class='col-xs-10'>
+	<div class="rp-runreport-display op-container">
+		<div class="rp-runreport-preview">
+		</div>
+	</div>
+</div>

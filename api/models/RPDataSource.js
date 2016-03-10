@@ -7,18 +7,24 @@
 
 module.exports = {
 
-  connection:"appdev_default",
+	connection: "appdev_default",
 
 	tableName: "rp_data_source",
 
-  attributes: {
-    name : { type: 'string', required: true },
+	attributes: {
+		name: { type: 'string', required: true },
 
-    schema : { type: 'json', required: true },
+		schema: { type: 'json', required: true },
 
-    permissions : { type: 'json' },
+		permissions: { type: 'json' },
 
-	getDataUrl : { type: 'string' }
-  }
+		getDataUrl: { type: 'string' },
+
+		/*
+		* name {string} : field name to filter
+		* type {string} : string, date or number
+		*/
+		filters: { type: 'json' }
+	}
 };
 
