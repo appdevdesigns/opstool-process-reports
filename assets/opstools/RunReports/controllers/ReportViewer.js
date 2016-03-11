@@ -28,10 +28,12 @@ steal(
 							this.dataSource = this.options.dataSource; // AD.models.Projects;
 
 							this.RPDataSource = AD.Model.get('opstools.ProcessReports.RPDataSource');
+							this.RPReportDefinition = AD.Model.get('opstools.ProcessReports.RPReportDefinition');
 
 							this.data = {};
 
 							this.initDOM();
+							this.loadReportDataSource();
 						},
 
 						initDOM: function () {
@@ -41,6 +43,9 @@ steal(
 							this.dom.ReportContentWidget = new AD.op.Widget(this.element.find('.jsr-content-viewport'));
 							this.element.find('.rp-runreport-preview-panel').hide();
 							this.element.find('.rp-runreport-loading').hide();
+
+							this.dom.modalPreview = this.element.find('.rp-runreport-workspace');
+							this.dom.modalPreview.modal('hide');
 						},
 
 						setReportViewer: function (reportTemplate) {
@@ -50,6 +55,8 @@ steal(
 
 							var _this = this;
 							var report_def = JSON.parse(reportTemplate.report_def);
+
+							this.data.reportTemplate = reportTemplate;
 
 							this.RPDataSource.findOne({ id: report_def.body.data_source }).then(function (data_source) {
 								var getDataUrl = data_source.getDataUrl;
@@ -148,6 +155,21 @@ steal(
 							return "<html><head><meta charset='UTF-8'><style>\n" + style + "\n</style></head>\n\n<body>" + html + "</body></html>";
 						},
 
+						loadReportDataSource: function () {
+							var _this = this;
+
+							this.RPDataSource.findAll()
+								.fail(function (err) {
+									console.error('!!! Dang.  something went wrong:', err);
+								})
+								.then(function (dataSources) {
+									_this.data.dataSources = dataSources.attr(); // Convert to array
+									_this.data.dataSources.forEach(function (ds) {
+										ds.id = ds.id.toString(); // jsReports support only id string
+									});
+								});
+						},
+
 						resize: function (height) {
 							this.data.screenHeight = height;
 
@@ -157,7 +179,38 @@ steal(
 							}
 						},
 
+						'.rp-runreport-edit click': function ($el, ev) {
+							var report_def = (typeof this.data.reportTemplate.report_def === 'string') ? JSON.parse(this.data.reportTemplate.report_def.replace(/'/g, '"')) : this.data.reportTemplate.report_def.attr();
 
+							this.dom.designer = new jsreports.Designer({
+								container: this.element.find('.rp-runreport-designer'),
+								embedded: true,
+								showToolbar: true, // If false, it shows overlap UI
+								showSaveButton: true,
+								data_sources: this.data.dataSources,
+								images: this.data.reportTemplate.images || [],
+								report_def: report_def,
+								layout: "horizontal"
+							});
+
+							// Remove save button
+							this.element.find('.save-button').remove();
+
+							// Show modal
+							this.dom.modalPreview.modal('show');
+						},
+
+						'.rp-runreport-save click': function ($el, ev) {
+							var _this = this;
+
+							this.data.reportTemplate.save().then(function () {
+								_this.RPReportDefinition.findOne({ id: _this.data.reportTemplate.id }).then(function (reportTemplate) {
+									_this.data.reportTemplate = reportTemplate;
+
+									_this.setReportViewer(_this.data.reportTemplate);
+								});
+							});
+						}
 
 					});
 

@@ -7,6 +7,12 @@
 	overflow: hidden !important;
 }
 
+.rp-runreport-designer {
+	height: 560px;
+	width: 880px;
+}
+
 .jsr-content-viewport {
 	background: white;
 }
+

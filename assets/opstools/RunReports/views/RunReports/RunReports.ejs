@@ -44,9 +44,24 @@
 			<div class="rp-runreport-preview op-widget-body">
 			</div>
 			<div class="rp-runreport-button pull-right op-container nobgcolor op-margin-top">
-				<button app-label-key="rpreport.runreport.buttons.eidt" class="rp-reporttemplate-submit btn btn-success offset-15"
-				type="submit"><i class="fa"></i>Edit</button>
+				<button app-label-key="rpreport.runreport.buttons.edit" class="rp-runreport-edit btn btn-success offset-15" type="submit"><i class="fa"></i>Edit</button>
 			</div>
 		</div>
+
+		<div class="rp-runreport-workspace modal fade" role="dialog">
+			<div class="modal-dialog modal-lg" style="width: 920px">
+				<div class="modal-content" style="width: 920px">
+					<div class="modal-body" style="height: 600px; width: 820px">
+						<div class="rp-runreport-designer">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="rp-runreport-save btn btn-success" data-dismiss="modal">Save</button>
+						<button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </div>
