@@ -38,9 +38,15 @@ steal(
 							this.dom = {};
 
 							this.dom.ViewWidget = new AD.op.Widget(this.element.find('.rp-runreport-preview'));
+							this.element.find('.rp-runreport-preview').hide();
+							this.element.find('.rp-runreport-loading').hide();
 						},
 
 						setReportViewer: function (reportTemplate) {
+							this.element.find('.rp-runreport-loading').show();
+							this.element.find('.rp-runreport-instructionsPanel').hide();
+							this.element.find('.rp-runreport-preview').hide();
+
 							var _this = this;
 							var report_def = JSON.parse(reportTemplate.report_def);
 
@@ -57,6 +63,9 @@ steal(
 										.pageFooter(null, report_def.page_footer)
 										.footer(null, report_def.footer)
 										.done();
+
+									_this.element.find('.rp-runreport-preview').show();
+									_this.element.find('.rp-runreport-loading').hide();
 
 									// Render report preview
 									jsreports.render({
