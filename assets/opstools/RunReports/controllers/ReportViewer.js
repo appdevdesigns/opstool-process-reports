@@ -38,14 +38,15 @@ steal(
 							this.dom = {};
 
 							this.dom.ViewWidget = new AD.op.Widget(this.element.find('.rp-runreport-preview'));
-							this.element.find('.rp-runreport-preview').hide();
+							this.dom.ReportContentWidget = new AD.op.Widget(this.element.find('.jsr-content-viewport'));
+							this.element.find('.rp-runreport-preview-panel').hide();
 							this.element.find('.rp-runreport-loading').hide();
 						},
 
 						setReportViewer: function (reportTemplate) {
 							this.element.find('.rp-runreport-loading').show();
 							this.element.find('.rp-runreport-instructionsPanel').hide();
-							this.element.find('.rp-runreport-preview').hide();
+							this.element.find('.rp-runreport-preview-panel').hide();
 
 							var _this = this;
 							var report_def = JSON.parse(reportTemplate.report_def);
@@ -64,7 +65,7 @@ steal(
 										.footer(null, report_def.footer)
 										.done();
 
-									_this.element.find('.rp-runreport-preview').show();
+									_this.element.find('.rp-runreport-preview-panel').show();
 									_this.element.find('.rp-runreport-loading').hide();
 
 									// Render report preview
@@ -97,7 +98,8 @@ steal(
 										downloadReportHtml[0].click();
 									});
 
-									_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.jsr-content-viewport'));
+									_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.rp-runreport-preview'));
+									_this.dom.ReportContentWidget = new AD.op.Widget(_this.element.find('.jsr-content-viewport'));
 
 									if (_this.data.screenHeight) {
 										_this.resize(_this.data.screenHeight);
@@ -150,7 +152,8 @@ steal(
 							this.data.screenHeight = height;
 
 							if (this.dom.ViewWidget) {
-								this.dom.ViewWidget.resize({ height: height });
+								this.dom.ViewWidget.resize({ height: height - 50 });
+								this.dom.ReportContentWidget.resize({ height: height - 105 });
 							}
 						},
 

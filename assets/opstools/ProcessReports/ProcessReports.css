@@ -44,7 +44,6 @@ li.rpreport-locked {
 .rp-report-preview {
 	background: white;
 	border: 1px solid #ccc;
-	height: 570px;
 	width: 860px;
 	overflow: hidden !important;
 }
