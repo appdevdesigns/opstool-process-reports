@@ -64,6 +64,10 @@ steal(
 						initEvents: function () {
 							var _this = this;
 
+							this.RPReportDefinition.bind('stale', function (ev, request) {
+								_this.loadReportTemplatesData();
+							});
+
 							this.controllers.ReportTemplatesList.element.on(this.CONST.ITEM_SELECTED, function (event, reportTemplate) {
 								_this.controllers.ReportViewer.setReportViewer(reportTemplate);
 							});

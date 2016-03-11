@@ -20,5 +20,22 @@ module.exports = {
 		// report_def: { type: 'json', required: true }
 		// Workaround: Canjs saves same format value 
 		report_def: { type: 'text', required: true }
+	},
+
+	afterCreate: function (newlyInsertedRecord, cb) {
+		sails.sockets.broadcast('sails_model_create_rpreportdefinition', 'rpreportdefinition', { verb: 'stale' });
+		
+		cb();
+	},
+	afterUpdate: function (updatedRecord, cb) {
+		sails.sockets.broadcast('sails_model_update_rpreportdefinition', 'rpreportdefinition', { verb: 'stale' });
+
+		cb();
+	},
+	afterDestroy: function (destroyedRecords, cb) {
+		sails.sockets.broadcast('sails_model_destroy_rpreportdefinition', 'rpreportdefinition', { verb: 'stale' });
+
+		cb();
 	}
+
 };
