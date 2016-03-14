@@ -8,6 +8,7 @@ module.exports = {
 	"meta": {
 		"opstools/RunReports": {
             "deps": [
+				"async",
                 "jsreports-all"
             ]
         }

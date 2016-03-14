@@ -26,13 +26,9 @@ module.exports = {
 	 *							   			access to this datasource.
 	 * @param {string} getDataUrl  			The get data url to render report.
 	 *
-	 * @param {array} filters				The field filter to show report
-	 * 						.name {string}	The field to filter
-	 * 						.type {string}	The field type - string, date or number
-	 *
 	 * @return {deferred} 
 	 */
-	addDataSource: function (dataSourceDefinition, permissions, getDataUrl, filters) {
+	addDataSource: function (dataSourceDefinition, permissions, getDataUrl) {
 		var dfd = AD.sal.Deferred();
 
 		// Validate required fields
@@ -74,8 +70,7 @@ module.exports = {
 							name: dataSourceDefinition.name,
 							schema: dataSourceDefinition.schema,
 							permissions: permissions || [],
-							getDataUrl: getDataUrl,
-							filters: filters
+							getDataUrl: getDataUrl
 						}).fail(function (err) {
 							dfd.fail(err);
 						}).then(function () {
@@ -89,8 +84,7 @@ module.exports = {
 							name: dataSourceDefinition.name,
 							schema: dataSourceDefinition.schema,
 							permissions: permissions || [],
-							getDataUrl: getDataUrl,
-							filters: filters
+							getDataUrl: getDataUrl
 						}).fail(function (err) {
 							dfd.fail(err);
 						}).then(function () {
