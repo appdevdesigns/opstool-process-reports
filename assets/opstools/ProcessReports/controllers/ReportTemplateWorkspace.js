@@ -78,6 +78,8 @@ steal(
 					setReportTemplate: function(reportTemplate) {
 						this.data.reportTemplate = reportTemplate;
 
+						var _this = this;
+
 						// Workaround : Convert report_def to string
 						var report_def = (typeof this.data.reportTemplate.report_def === 'string') ? JSON.parse(this.data.reportTemplate.report_def.replace(/'/g, '"')) : this.data.reportTemplate.report_def.attr();
 
@@ -96,6 +98,9 @@ steal(
 						});
 
 						// $('.jsr-designer-toolbar').remove(); // Fix overlap report UI layout
+						$(this.dom.designer).on("save", function(evt, def) {
+							_this.element.find('.rp-reporttemplate-save').click();
+						});
 
 						this.element.find('.rp-report-title').html(can.view('RP_TitleForm', { title: this.data.reportTemplate.title }));
 
@@ -143,6 +148,8 @@ steal(
 								case 'number':
 									data[f.name] = 9999;
 									break;
+								case 'date':
+									data[f.name] = new Date();
 								default:
 									data[f.name] = '[' + f.name + ']';
 									break;
