@@ -83,22 +83,53 @@ steal(
 									});
 								},
 								function(next) {
+									var getJoinDsTasks = [];
+
+									// Find Join data source object
+									data_sources.forEach(function(ds) {
+										if (ds.join) {
+											getJoinDsTasks.push(function(callback) {
+												_this.RPDataSource.findAll({ or: [{ id: ds.join.left }, { id: ds.join.right }] }).then(function(ds) {
+													data_sources = data_sources.concat(ds);
+
+													callback();
+												});
+											});
+										}
+									});
+
+									async.parallel(getJoinDsTasks, function() {
+										data_sources = $.unique(data_sources.attr());
+
+										next();
+									});
+								},
+								function(next) {
 									var getDataSourcesTasks = [];
 
 									// Get data to render report
 									data_sources.forEach(function(ds) {
-										getDataSourcesTasks.push(function(callback) {
-											AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {												
-												datasets.push({
-													"id": ds.id.toString(),
-													"name": ds.name,
-													"data": data instanceof Array ? data : [data],
-													"schema": ds.schema.attr()
-												});
-
-												callback();
+										if (ds.join) {
+											datasets.push({
+												"id": ds.id.toString(),
+												"name": ds.name,
+												"join": ds.join
 											});
-										});
+										}
+										else {
+											getDataSourcesTasks.push(function(callback) {
+												AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {
+													datasets.push({
+														"id": ds.id.toString(),
+														"name": ds.name,
+														"data": data instanceof Array ? data : [data],
+														"schema": (typeof ds.schema === 'string' ? JSON.parse(ds.schema) : ds.schema)
+													});
+
+													callback();
+												});
+											});
+										}
 									});
 
 									async.parallel(getDataSourcesTasks, function() {
@@ -109,7 +140,7 @@ steal(
 							function() {
 								_this.element.find('.rp-runreport-preview-panel').show();
 								_this.element.find('.rp-runreport-loading').hide();
-
+								console.log('datasets: ', datasets);
 								// Render report preview
 								jsreports.render({
 									report_def: report_def,

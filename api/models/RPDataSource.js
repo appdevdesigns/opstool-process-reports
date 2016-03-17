@@ -14,7 +14,9 @@ module.exports = {
 	attributes: {
 		name: { type: 'string', required: true },
 
-		schema: { type: 'json', required: true },
+		schema: { type: 'json' },
+
+		join: { type: 'json' },
 
 		permissions: { type: 'json' },
 

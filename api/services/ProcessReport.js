@@ -32,7 +32,7 @@ module.exports = {
 		var dfd = AD.sal.Deferred();
 
 		// Validate required fields
-		var requiredProperties = ['name', 'schema', 'schema.fields'];
+		var requiredProperties = ['name'];
         var allPropertiesFound = true;
         requiredProperties.forEach(function (prop) {
         
@@ -59,8 +59,8 @@ module.exports = {
         } else {
 			RPDataSource.findOne({
 				name: dataSourceDefinition.name
-			}, function (err, result) {
-				if (result) {
+			}, function (err, ds) {
+				if (ds) {
 					// Update exists data source
 					RPDataSource.update(
 						{
@@ -69,12 +69,13 @@ module.exports = {
 						{
 							name: dataSourceDefinition.name,
 							schema: dataSourceDefinition.schema,
+							join: dataSourceDefinition.join,
 							permissions: permissions || [],
 							getDataUrl: getDataUrl
 						}).fail(function (err) {
 							dfd.fail(err);
-						}).then(function () {
-							dfd.resolve();
+						}).then(function (result) {
+							dfd.resolve(result);
 						});
 				}
 				else {
@@ -83,12 +84,13 @@ module.exports = {
 						{
 							name: dataSourceDefinition.name,
 							schema: dataSourceDefinition.schema,
+							join: dataSourceDefinition.join,
 							permissions: permissions || [],
 							getDataUrl: getDataUrl
 						}).fail(function (err) {
 							dfd.fail(err);
-						}).then(function () {
-							dfd.resolve();
+						}).then(function (result) {
+							dfd.resolve(result);
 						});
 				}
 			});
