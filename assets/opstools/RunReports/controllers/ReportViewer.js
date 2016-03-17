@@ -160,10 +160,15 @@ steal(
 									var html = _this.getReportHtml();
 
 									// Download the report html file
-									var downloadReportHtml = $(document.createElement('a'));
-									downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
-									downloadReportHtml.attr('download', report_def.title + '.htm');
-									downloadReportHtml[0].click();
+									var clickEvent = new MouseEvent('click', {
+										'view': window,
+										'bubbles': true,
+										'cancelable': true
+									});
+									var downloadLink = document.createElement('a');
+									downloadLink.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
+									downloadLink.setAttribute('download', report_def.title + '.htm');
+									downloadLink.dispatchEvent(clickEvent);
 								});
 
 								_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.rp-runreport-preview'));
