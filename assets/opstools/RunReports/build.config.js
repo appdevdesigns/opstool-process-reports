@@ -1,6 +1,4 @@
 module.exports = {
-    "map": {
-    },
     "paths": {
         "opstools/RunReports": "opstools/RunReports/RunReports.js",
     },

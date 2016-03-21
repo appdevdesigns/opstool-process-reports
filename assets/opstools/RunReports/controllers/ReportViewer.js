@@ -99,7 +99,17 @@ steal(
 									});
 
 									async.parallel(getJoinDsTasks, function() {
-										data_sources = $.unique(data_sources.attr());
+										// Unique data sources
+										var data_source_ids = {};
+										var unique_ids = [];
+
+										$.each(data_sources, function(i, ds) {
+											if (!data_source_ids[ds.id]) {
+												data_source_ids[ds.id] = true;
+												unique_ids.push(ds);
+											}
+										});
+										data_sources = unique_ids;
 
 										next();
 									});
@@ -113,17 +123,18 @@ steal(
 											datasets.push({
 												"id": ds.id.toString(),
 												"name": ds.name,
-												"join": ds.join
+												"join": ds.join.attr()
 											});
 										}
 										else {
 											getDataSourcesTasks.push(function(callback) {
 												AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {
+
 													datasets.push({
 														"id": ds.id.toString(),
 														"name": ds.name,
 														"data": data instanceof Array ? data : [data],
-														"schema": (typeof ds.schema === 'string' ? JSON.parse(ds.schema) : ds.schema)
+														"schema": (typeof ds.schema === 'string' ? JSON.parse(ds.schema) : ds.schema.attr())
 													});
 
 													callback();
@@ -140,7 +151,7 @@ steal(
 							function() {
 								_this.element.find('.rp-runreport-preview-panel').show();
 								_this.element.find('.rp-runreport-loading').hide();
-								console.log('datasets: ', datasets);
+
 								// Render report preview
 								jsreports.render({
 									report_def: report_def,
