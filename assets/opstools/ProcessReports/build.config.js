@@ -12,8 +12,7 @@ module.exports = {
 	"meta": {
 		"opstools/ProcessReports": {
             "deps": [
-				"async",
-                "jsreports-all"
+				"async"
             ]
         },
 		"js/jsreports-all.min": {
