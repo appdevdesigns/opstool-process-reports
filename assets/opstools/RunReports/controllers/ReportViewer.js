@@ -130,16 +130,6 @@ steal(
 											getDataSourcesTasks.push(function(callback) {
 												AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {
 
-													// data.forEach(function(d) {
-													// 	if (d.startDate) {
-													// 		d.startDate = '1/20/2016';
-													// 		// console.log('d: ', d);
-													// 	}
-													// });
-
-													// var data2 = data.concat([]);
-													// console.log('data: ', data2);
-
 													datasets.push({
 														"id": ds.id.toString(),
 														"name": ds.name,
