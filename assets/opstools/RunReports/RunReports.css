@@ -16,3 +16,9 @@
 	background: white;
 }
 
+.rp-runreport-loading p {
+    color: #000;
+}
+.jsr-report {
+    line-height: normal !important;
+}

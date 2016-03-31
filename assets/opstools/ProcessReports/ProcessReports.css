@@ -48,3 +48,7 @@ li.rpreport-locked {
 	height: 560px;
 	overflow: hidden !important;
 }
+
+.rp-instructionsPanel p {
+    color: #000;
+}
