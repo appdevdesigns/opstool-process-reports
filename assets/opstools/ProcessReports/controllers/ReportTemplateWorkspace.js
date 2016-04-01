@@ -315,9 +315,9 @@ steal(
 						$(".jsr-save-dropdown-button li[role='presentation']").remove();
 
 						// Add export HTML report format menu
-						$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html">HTML</a></li>');
+						$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html rp-report-preview-export-html">HTML</a></li>');
 
-						$('.jsr-export-html').bind('click', function() {
+						$('.rp-report-preview-export-html').bind('click', function() {
 							// Get report html format
 							var html = _this.getReportHtml();
 
@@ -333,7 +333,7 @@ steal(
 					},
 
 					getReportHtml: function() {
-						var selector = '.jsr-content-viewport';
+						var selector = '.rp-report-preview .jsr-content-viewport';
 						var html = '<div class="jsr-report">' + $(selector).html() + '</div>';
 
 						selector = selector.split(",").map(function(subselector) {
