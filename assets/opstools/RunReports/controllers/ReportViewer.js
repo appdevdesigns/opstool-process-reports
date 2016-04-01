@@ -280,6 +280,9 @@ steal(
 					'.rp-runreport-save click': function($el, ev) {
 						var _this = this;
 
+						var report_def = JSON.stringify(this.dom.designer.getReport());
+						this.data.reportTemplate.attr('report_def', report_def);
+
 						this.data.reportTemplate.save().then(function() {
 							_this.RPReportDefinition.findOne({ id: _this.data.reportTemplate.id }).then(function(reportTemplate) {
 								_this.data.reportTemplate = reportTemplate;
