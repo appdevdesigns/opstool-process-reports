@@ -134,10 +134,20 @@ steal(
 
 					findDataSchema: function(id) {
 						var data_schema = null;
-						this.data.dataSources.forEach(function(ds) {
-							if (ds.id === id)
-								data_schema = ds.schema;
-						});
+
+						var dataSource = $.grep(this.data.dataSources, function(ds) { return ds.id === id; })[0];
+
+						if (dataSource.join) {
+							var leftDs = $.grep(this.data.dataSources, function(ds) { return ds.id == dataSource.join.left; })[0];
+							var rightDs = $.grep(this.data.dataSources, function(ds) { return ds.id == dataSource.join.right; })[0];
+
+							data_schema = {
+								fields: leftDs.schema.fields.concat(rightDs.schema.fields)
+							};
+						} else if (dataSource.data_schema) {
+							data_schema = dataSource.schema;
+						}
+
 						return data_schema;
 					},
 
