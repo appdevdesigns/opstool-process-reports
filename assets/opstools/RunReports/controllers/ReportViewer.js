@@ -160,8 +160,8 @@ steal(
 									datasets: datasets
 								});
 
-								// Remove export PDF/Excel menu
-								$(".jsr-save-dropdown-button li[role='presentation']").remove();
+								// Remove export PDF menu
+								$('.jsr-export-pdf').parent('li').remove();
 
 								// Add export HTML report format menu
 								$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html rp-run-report-export-html">HTML</a></li>');

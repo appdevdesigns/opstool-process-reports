@@ -311,8 +311,8 @@ steal(
 						// Fix report toolbar
 						$('.jsr-content-viewport').css('top', '40px');
 
-						// Remove export PDF/Excel menu
-						$(".jsr-save-dropdown-button li[role='presentation']").remove();
+						// Remove export PDF menu
+						$('.jsr-export-pdf').parent('li').remove();
 
 						// Add export HTML report format menu
 						$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html rp-report-preview-export-html">HTML</a></li>');
