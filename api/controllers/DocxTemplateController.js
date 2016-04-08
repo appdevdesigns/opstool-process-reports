@@ -161,7 +161,7 @@ module.exports = {
 					getSize: function(imgBuffer, tagValue, tagName) {
 						if (imgBuffer) {
 							var maxWidth = 300;
-							var maxHeight = 225;
+							var maxHeight = 160;
 
 							// Find aspect ratio image dimensions
 							var image = sizeOf(imgBuffer);
