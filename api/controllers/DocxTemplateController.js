@@ -84,46 +84,46 @@ module.exports = {
 					var groupedActivities = _.groupBy(activities, 'activity_id');
 
 					var image_row_number = 0;
-					// s.activities = _.transform(groupedActivities, function(result, current) {
-					// 	var r = {};
+					s.activities = _.transform(groupedActivities, function(result, current) {
+						var r = {};
 
-					// 	// Show page header
-					// 	if (image_row_number === 1 || (image_row_number - 1) % 2 === 0)
-					// 		r.activity_has_header = true;
+						// Show page header
+						if (image_row_number === 1 || (image_row_number - 1) % 2 === 0)
+							r.activity_has_header = true;
 
-					// 	r.activity_name = current[0].activity_name;
-					// 	r.activity_description = current[0].activity_description;
-					// 	r.images = _.map(current, function(img) {
-					// 		var image = {};
+						r.activity_name = current[0].activity_name;
+						r.activity_description = current[0].activity_description;
+						r.images = _.map(current, function(img) {
+							var image = {};
 
-					// 		if (img.activity_image_file_name_left_column)
-					// 			image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
+							if (img.activity_image_file_name_left_column)
+								image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
 
-					// 		if (img.activity_image_file_name_right_column)
-					// 			image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
+							if (img.activity_image_file_name_right_column)
+								image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
-					// 		if (img.activity_image_caption_left_column)
-					// 			image.activity_image_caption_left_column = img.activity_image_caption_left_column;
-					// 		else
-					// 			image.activity_image_caption_left_column = '';
+							if (img.activity_image_caption_left_column)
+								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
+							else
+								image.activity_image_caption_left_column = '';
 
-					// 		if (img.activity_image_caption_right_column)
-					// 			image.activity_image_caption_right_column = img.activity_image_caption_right_column;
-					// 		else
-					// 			image.activity_image_caption_right_column = '';
+							if (img.activity_image_caption_right_column)
+								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
+							else
+								image.activity_image_caption_right_column = '';
 
-					// 		// Show page header
-					// 		if (!r.activity_has_header && (image_row_number === 1 || (image_row_number - 1) % 2 === 0))
-					// 			image.has_header = true;
+							// Show page header
+							if (!r.activity_has_header && (image_row_number === 1 || (image_row_number - 1) % 2 === 0))
+								image.has_header = true;
 
-					// 		image_row_number++;
+							image_row_number++;
 
-					// 		return image;
-					// 	});
+							return image;
+						});
 
-					// 	result.push(r);
+						result.push(r);
 
-					// }, []);
+					}, []);
 
 				});
 
