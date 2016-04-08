@@ -166,6 +166,10 @@ steal(
 								// Add export HTML report format menu
 								$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html rp-run-report-export-html">HTML</a></li>');
 
+								if (reportTemplate.getDocxUrl) {
+									$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-docx rp-run-report-export-docx">Docx</a></li>');
+								}
+
 								$('.rp-run-report-export-html').bind('click', function() {
 									// Get report html format
 									var html = _this.getReportHtml();
@@ -180,6 +184,11 @@ steal(
 									downloadLink.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
 									downloadLink.setAttribute('download', report_def.title + '.htm');
 									downloadLink.dispatchEvent(clickEvent);
+								});
+
+								$('.rp-run-report-export-docx').bind('click', function(e) {
+									e.preventDefault();
+									window.location.href = reportTemplate.getDocxUrl;
 								});
 
 								_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.rp-runreport-preview'));

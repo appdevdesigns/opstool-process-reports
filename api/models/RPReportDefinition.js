@@ -19,20 +19,22 @@ module.exports = {
 
 		// report_def: { type: 'json', required: true }
 		// Workaround: Canjs saves same format value 
-		report_def: { type: 'text', required: true }
+		report_def: { type: 'text', required: true },
+
+		getDocxUrl: { type: 'string' }
 	},
 
-	afterCreate: function (newlyInsertedRecord, cb) {
+	afterCreate: function(newlyInsertedRecord, cb) {
 		sails.sockets.broadcast('sails_model_create_rpreportdefinition', 'rpreportdefinition', { verb: 'stale' });
-		
+
 		cb();
 	},
-	afterUpdate: function (updatedRecord, cb) {
+	afterUpdate: function(updatedRecord, cb) {
 		sails.sockets.broadcast('sails_model_update_rpreportdefinition', 'rpreportdefinition', { verb: 'stale' });
 
 		cb();
 	},
-	afterDestroy: function (destroyedRecords, cb) {
+	afterDestroy: function(destroyedRecords, cb) {
 		sails.sockets.broadcast('sails_model_destroy_rpreportdefinition', 'rpreportdefinition', { verb: 'stale' });
 
 		cb();
