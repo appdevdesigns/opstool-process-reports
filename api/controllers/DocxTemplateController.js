@@ -37,6 +37,9 @@ module.exports = {
 						var r = JSON.parse(result);
 						if (r.status === 'success') {
 							staffs.staffs = r.data;
+
+							// For TEST: reduce number staffs
+							staffs.staffs = staffs.staffs.slice(0, 5);
 						}
 
 						next();
