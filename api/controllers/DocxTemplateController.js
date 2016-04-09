@@ -18,23 +18,116 @@ module.exports = {
 	activities: function(req, res) {
 		AD.log('<green>::: docxtemplate.activities() :::</green>');
 
-		// async
+		var staffs = { staffs: null };
+		var activities;
+		var resultBuffer;
+
+		async.series([
+
+			// Get data
+			function(next) {
+				async.parallel([
+					// Get staffs data
+					function(callback) {
+						var temp_res = {
+							send: function(result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									staffs.staffs = r.data;
+								}
+
+								callback();
+							}
+						};
+
+						renderReportController.staffs(req, temp_res);
+					},
+					// Get activity images data
+					function(callback) {
+						var temp_res = {
+							send: function(result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success')
+									activities = r.data;
+
+								callback();
+							}
+						};
+
+						renderReportController.activities(req, temp_res);
+					}
+				], function(err) {
+					next(err);
+				});
+			},
+
+			// Convert data to support docx template
+			function(next) {
+				staffs.staffs.forEach(function(s) {
+					s.person_activities = _.filter(activities, function(a) {
+						return s.person_id == a.person_id;
+					});
+				});
+
+				_.remove(staffs.staffs, function(s) {
+					return typeof s.person_activities === 'undefined' || !s.person_activities || s.person_activities.length < 1;
+				});
+
+				next();
+			},
+
+			// Generate docx file
+			function(next) {
+
+				// TODO : Get file binary from database
+				fs.readFile(__dirname + "/../../docx templates/activities.docx", "binary", function(err, content) {
+					var docx = new DocxGen()
+						.load(content)
+						.setData(staffs).render();
+
+					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
+
+					next();
+				});
+			}
+
+		], function(err, r) {
+
+			if (err) {
+
+				ADCore.comm.error(res, err, 500);
+			} else {
+
+				AD.log('<green>::: end docxtemplate.activities() :::</green>');
+
+				// var buff = new Buffer(resultBuffer, 'binary');
+
+				// res.set({
+				// 	"Content-Disposition": 'attachment; filename="' + 'activities.docx' + '"',
+				// 	"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+				// 	"Content-Length": buff.length
+				// });
+
+				// res.send(buff);
+				ADCore.comm.success(res, staffs.staffs);
+			}
+		});
 	},
 
 	// /opstool-process-reports/docxtemplate/acitivity_images
 	acitivity_images: function(req, res) {
 		AD.log('<green>::: docxtemplate.acitivity_images() :::</green>');
 
-		var _this = this;
 		var staffs = { staffs: null };
 		var activity_images;
 		var resultBuffer;
 
 		async.series([
 
-			// Get staffs data
+			// Get data
 			function(next) {
 				async.parallel([
+					// Get staffs data
 					function(callback) {
 						var temp_res = {
 							send: function(result, code) {
@@ -148,7 +241,7 @@ module.exports = {
 				next();
 			},
 
-			// Generate doc file
+			// Generate docx file
 			function(next) {
 
 				var imageModule = new DocxImageModule({
