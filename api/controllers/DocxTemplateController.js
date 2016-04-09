@@ -17,6 +17,8 @@ module.exports = {
 	// /opstool-process-reports/docxtemplate/activities
 	activities: function(req, res) {
 		AD.log('<green>::: docxtemplate.activities() :::</green>');
+
+		// async
 	},
 
 	// /opstool-process-reports/docxtemplate/acitivity_images
@@ -32,36 +34,41 @@ module.exports = {
 
 			// Get staffs data
 			function(next) {
-				var temp_res = {
-					send: function(result, code) {
-						var r = JSON.parse(result);
-						if (r.status === 'success') {
-							staffs.staffs = r.data;
+				async.parallel([
+					function(callback) {
+						var temp_res = {
+							send: function(result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									staffs.staffs = r.data;
 
-							// For TEST: reduce number staffs
-							staffs.staffs = staffs.staffs.slice(0, 5);
-						}
+									// For TEST: reduce number staffs
+									staffs.staffs = staffs.staffs.slice(0, 5);
+								}
 
-						next();
+								callback();
+							}
+						};
+
+						renderReportController.staffs(req, temp_res);
+					},
+					// Get activity images data
+					function(callback) {
+						var temp_res = {
+							send: function(result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success')
+									activity_images = r.data;
+
+								callback();
+							}
+						};
+
+						renderReportController.acitivity_images(req, temp_res);
 					}
-				};
-
-				renderReportController.staffs(req, temp_res);
-			},
-
-			// Get activity images data
-			function(next) {
-				var temp_res = {
-					send: function(result, code) {
-						var r = JSON.parse(result);
-						if (r.status === 'success')
-							activity_images = r.data;
-
-						next();
-					}
-				};
-
-				renderReportController.acitivity_images(req, temp_res);
+				], function(err) {
+					next(err);
+				});
 			},
 
 			// Convert data to support docx template
