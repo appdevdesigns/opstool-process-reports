@@ -64,13 +64,13 @@ module.exports = {
 			// Convert data to support docx template
 			function(next) {
 				staffs.staffs.forEach(function(s) {
-					s.person_activities = _.filter(activities, function(a) {
+					s.activities = _.filter(activities, function(a) {
 						return s.person_id == a.person_id;
 					});
 				});
 
 				_.remove(staffs.staffs, function(s) {
-					return typeof s.person_activities === 'undefined' || !s.person_activities || s.person_activities.length < 1;
+					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
 				});
 
 				next();
@@ -80,7 +80,7 @@ module.exports = {
 			function(next) {
 
 				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activities.docx", "binary", function(err, content) {
+				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function(err, content) {
 					var docx = new DocxGen()
 						.load(content)
 						.setData(staffs).render();
@@ -100,16 +100,16 @@ module.exports = {
 
 				AD.log('<green>::: end docxtemplate.activities() :::</green>');
 
-				// var buff = new Buffer(resultBuffer, 'binary');
+				var buff = new Buffer(resultBuffer, 'binary');
 
-				// res.set({
-				// 	"Content-Disposition": 'attachment; filename="' + 'activities.docx' + '"',
-				// 	"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-				// 	"Content-Length": buff.length
-				// });
+				res.set({
+					"Content-Disposition": 'attachment; filename="' + 'activities.docx' + '"',
+					"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+					"Content-Length": buff.length
+				});
 
-				// res.send(buff);
-				ADCore.comm.success(res, staffs.staffs);
+				res.send(buff);
+				// ADCore.comm.success(res, staffs.staffs);
 			}
 		});
 	},
@@ -276,7 +276,7 @@ module.exports = {
 				});
 
 				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activity images.docx", "binary", function(err, content) {
+				fs.readFile(__dirname + "/../../docx templates/activity images template.docx", "binary", function(err, content) {
 					var docx = new DocxGen()
 						.attachModule(imageModule)
 						.load(content)
