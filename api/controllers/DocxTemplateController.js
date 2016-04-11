@@ -178,6 +178,10 @@ module.exports = {
 		var activity_images;
 		var resultBuffer;
 
+		var staffName = req.param('Member name');
+		var startDate = req.param('Start date');
+		var endDate = req.param('End date');
+
 		async.series([
 
 			// Get data
@@ -222,6 +226,45 @@ module.exports = {
 
 			// Convert data to support docx template
 			function(next) {
+				// Staffs filter
+				if (staffName) {
+					data.staffs = _.filter(data.staffs, function(s) {
+						return s.person_name.indexOf(staffName) > -1 || s.person_name_en.indexOf(staffName) > -1;
+					});
+				}
+
+				// Activities start date filter
+				if (startDate) {
+					var startDateObj = moment(startDate, 'M/D/YY', 'en');
+					_.remove(activity_images, function(a) {
+						var actStartDateObj = moment(a.activity_start_date);
+
+						if (!a.activity_start_date || actStartDateObj < startDateObj)
+							return true;
+						else
+							return false;
+					});
+
+					if (startDateObj.isValid())
+						data.startDate = changeThaiFormat(startDateObj)
+				}
+
+				// Activities end date filter
+				if (endDate) {
+					var endDateObj = moment(endDate, 'M/D/YY', 'en');
+					_.remove(activity_images, function(a) {
+						var actEndDateObj = moment(a.acitivity_end_date);
+
+						if (!a.acitivity_end_date || (actEndDateObj.isValid() && actEndDateObj > endDateObj))
+							return true;
+						else
+							return false;
+					});
+
+					if (endDateObj.isValid())
+						data.endDate = changeThaiFormat(endDateObj)
+				}
+
 				// Delete null value properties
 				activity_images.forEach(function(img, index) {
 					if (!img.activity_image_file_name_right_column || img.activity_image_file_name_right_column === 'blank.jpg')
@@ -291,8 +334,8 @@ module.exports = {
 					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
 				});
 
-				staffs.activity_image_file_name_left_column = ""; // Ignore bug in docxtemplater-image-module v.1.0.0 unstable
-				staffs.activity_image_file_name_right_column = ""; // Ignore bug in docxtemplater-image-module v.1.0.0 unstable
+				data.activity_image_file_name_left_column = ""; // Ignore bug in docxtemplater-image-module v.1.0.0 unstable
+				data.activity_image_file_name_right_column = ""; // Ignore bug in docxtemplater-image-module v.1.0.0 unstable
 
 				next();
 			},
@@ -336,7 +379,7 @@ module.exports = {
 					var docx = new DocxGen()
 						.attachModule(imageModule)
 						.load(content)
-						.setData(staffs).render();
+						.setData(data).render();
 
 					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
 
