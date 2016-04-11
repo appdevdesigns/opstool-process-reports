@@ -261,10 +261,11 @@ steal(
 
 					// Preview button in the edit page 
 					'.rp-reporttemplate-preview click': function() {
-
-						var _this = this;
-						var report_def = this.dom.designer.getReport();
-						var datasets = [];
+						var _this = this,
+							report_def = this.dom.designer.getReport(),
+							data_source_ids = [],
+							data_sources = [],
+							datasets = [];
 
 						// Find data source schema
 						var data_schema = this.findDataSchema(report_def.body.data_source);
@@ -274,62 +275,150 @@ steal(
 							return;
 						}
 
-						// Mock data to display report preview
-						var data = [this.mockDataPreview(data_schema)];
+						$('.rp-report-preview-loading').show();
+						$('.rp-report-preview').hide();
 
-						datasets.push({
-							"id": report_def.body.data_source,
-							"name": report_def.body.data_source,
-							"data": data,
-							"schema": data_schema
-						});
+						// Show modal
+						_this.dom.modalPreview.modal('show');
 
+						data_source_ids.push({ id: report_def.body.data_source });
+
+						// Find subreport data source info
 						if (report_def.body.elements && report_def.body.elements.length > 0) {
 							report_def.body.elements.forEach(function(elm) {
 								if (elm.type === 'subreport') {
-									var sub_report_data_schema = _this.findDataSchema(elm.report.body.data_source);
-									var sub_report_data = [_this.mockDataPreview(sub_report_data_schema)];
-
-									datasets.push({
-										"id": elm.report.body.data_source,
-										"name": elm.report.body.data_source,
-										"data": sub_report_data,
-										"schema": sub_report_data_schema
-									});
+									data_source_ids.push({ id: elm.report.body.data_source });
 								}
 							});
 						}
 
-						// Render report preview
-						jsreports.render({
-							report_def: report_def,
-							target: _this.element.find(".rp-report-preview"),
-							showToolbar: true,
-							datasets: datasets
-						});
+						async.series(
+							[
+								function(next) {
+									// Get data sources info
+									_this.RPDataSource.findAll({ or: data_source_ids }).then(function(ds) {
+										data_sources = ds;
 
-						// Fix report toolbar
-						$('.jsr-content-viewport').css('top', '40px');
+										next();
+									});
+								},
+								function(next) {
+									var getJoinDsTasks = [];
 
-						// Remove export PDF menu
-						$('.jsr-export-pdf').parent('li').remove();
+									// Find Join data source object
+									data_sources.forEach(function(ds) {
+										if (ds.join) {
+											getJoinDsTasks.push(function(callback) {
+												_this.RPDataSource.findAll({ or: [{ id: ds.join.left }, { id: ds.join.right }] }).then(function(ds) {
+													data_sources = data_sources.concat(ds);
 
-						// Add export HTML report format menu
-						$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html rp-report-preview-export-html">HTML</a></li>');
+													callback();
+												});
+											});
+										}
+									});
 
-						$('.rp-report-preview-export-html').bind('click', function() {
-							// Get report html format
-							var html = _this.getReportHtml();
+									async.parallel(getJoinDsTasks, function() {
+										// Unique data sources
+										var data_source_ids = {};
+										var unique_ids = [];
 
-							// Download the report html file
-							var downloadReportHtml = $(document.createElement('a'));
-							downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
-							downloadReportHtml.attr('download', report_def.title + '.htm');
-							downloadReportHtml[0].click();
-						});
+										$.each(data_sources, function(i, ds) {
+											if (!data_source_ids[ds.id]) {
+												data_source_ids[ds.id] = true;
+												unique_ids.push(ds);
+											}
+										});
+										data_sources = unique_ids;
 
-						// Show modal
-						_this.dom.modalPreview.modal('show');
+										next();
+									});
+								},
+								function(next) {
+									var getDataSourcesTasks = [];
+
+									// Get data to render report
+									data_sources.forEach(function(ds) {
+										if (ds.join) {
+											datasets.push({
+												"id": ds.id.toString(),
+												"name": ds.name,
+												"join": ds.join.attr()
+											});
+										}
+										else {
+											getDataSourcesTasks.push(function(callback) {
+												AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {
+
+													datasets.push({
+														"id": ds.id.toString(),
+														"name": ds.name,
+														"data": data instanceof Array ? data : [data],
+														"schema": (typeof ds.schema === 'string' ? JSON.parse(ds.schema) : ds.schema.attr())
+													});
+
+													callback();
+												});
+											});
+										}
+									});
+
+									async.parallel(getDataSourcesTasks, function() {
+										next();
+									});
+								}
+							], function() {
+								$('.rp-report-preview').show();
+
+								// Render report preview
+								jsreports.render({
+									report_def: report_def,
+									target: _this.element.find(".rp-report-preview"),
+									showToolbar: true,
+									datasets: datasets
+								});
+
+								// Fix report toolbar
+								$('.jsr-content-viewport').css('top', '40px');
+
+								// Remove export PDF menu
+								$('.jsr-export-pdf').parent('li').remove();
+
+								// Add export HTML report format menu
+								$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-html rp-report-preview-export-html">HTML</a></li>');
+
+								if (_this.data.reportTemplate.getDocxUrl) {
+									$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-docx rp-run-report-export-docx">Docx</a></li>');
+								}
+
+								$('.rp-report-preview-export-html').bind('click', function() {
+									// Get report html format
+									var html = _this.getReportHtml();
+
+									// Download the report html file
+									var downloadReportHtml = $(document.createElement('a'));
+									downloadReportHtml.attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(html));
+									downloadReportHtml.attr('download', report_def.title + '.htm');
+									downloadReportHtml[0].click();
+								});
+
+								$('.rp-run-report-export-docx').bind('click', function(e) {
+									e.preventDefault();
+
+									var filter = '';
+									_this.element.find(".jsreports-input").each(function(index) {
+										var value = $(this).find('input').val();
+										if (value) {
+											var name = $(this).text().split(':')[0];
+											filter += name + '=' + value + '&';
+										}
+									});
+
+									window.location.href = _this.data.reportTemplate.getDocxUrl + (filter ? '?' + filter : '');
+								});
+
+								$('.rp-report-preview-loading').hide();
+							});
 					},
 
 					getReportHtml: function() {
