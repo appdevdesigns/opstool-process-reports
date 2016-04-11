@@ -7,6 +7,7 @@
 var AD = require('ad-utils'),
 	async = require('async'),
 	_ = require('lodash'),
+	moment = require('moment'),
 	fs = require('fs'),
 	DocxGen = require('docxtemplater'),
 	DocxImageModule = require('docxtemplater-image-module'),
@@ -65,6 +66,15 @@ module.exports = {
 			function(next) {
 				staffs.staffs.forEach(function(s) {
 					s.activities = _.filter(activities, function(a) {
+						// Convert date time to Thai format
+						var visaStartDate = moment(s.person_visa_start_date, 'DD MMMM YYYY', 'en');
+						if (visaStartDate.isValid())
+							s.person_visa_start_date = visaStartDate.add(543, 'years').locale('th').format('D MMMM YYYY');
+
+						var visaExpireDate = moment(s.person_visa_expire_date, 'DD MMMM YYYY', 'en');
+						if (visaExpireDate.isValid())
+							s.person_visa_expire_date = visaExpireDate.add(543, 'years').locale('th').format('D MMMM YYYY');
+
 						return s.person_id == a.person_id;
 					});
 				});
