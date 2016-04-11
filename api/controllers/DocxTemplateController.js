@@ -14,14 +14,22 @@ var AD = require('ad-utils'),
 	sizeOf = require('image-size'),
 	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js');
 
+function changeThaiFormat(momentDate) {
+	return momentDate.add(543, 'years').locale('th').format('D MMMM YYYY');
+}
+
 module.exports = {
 	// /opstool-process-reports/docxtemplate/activities
 	activities: function(req, res) {
 		AD.log('<green>::: docxtemplate.activities() :::</green>');
 
-		var staffs = { staffs: null };
+		var data = { staffs: null };
 		var activities;
 		var resultBuffer;
+
+		var staffName = req.param('Member name');
+		var startDate = req.param('Start date');
+		var endDate = req.param('End date');
 
 		async.series([
 
@@ -34,7 +42,7 @@ module.exports = {
 							send: function(result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
-									staffs.staffs = r.data;
+									data.staffs = r.data;
 								}
 
 								callback();
@@ -64,22 +72,61 @@ module.exports = {
 
 			// Convert data to support docx template
 			function(next) {
-				staffs.staffs.forEach(function(s) {
+				// Staffs filter
+				if (staffName) {
+					_.remove(data.staffs, function(s) {
+						return s.person_name.indexOf(staffName) < 1;
+					});
+				}
+
+				// Activities start date filter
+				if (startDate) {
+					var startDateObj = moment(startDate, 'M/D/YY', 'en');
+					_.remove(activities, function(a) {
+						var actStartDateObj = moment(a.startDate);
+
+						if (!a.startDate || actStartDateObj < startDateObj)
+							return true;
+						else
+							return false;
+					});
+
+					if (startDateObj.isValid())
+						data.startDate = changeThaiFormat(startDateObj)
+				}
+
+				// Activities end date filter
+				if (endDate) {
+					var endDateObj = moment(endDate, 'M/D/YY', 'en');
+					_.remove(activities, function(a) {
+						var actEndDateObj = moment(a.endDate);
+
+						if (!a.endDate || (actEndDateObj.isValid() && actEndDateObj > endDateObj))
+							return true;
+						else
+							return false;
+					});
+
+					if (endDateObj.isValid())
+						data.endDate = changeThaiFormat(endDateObj)
+				}
+
+				data.staffs.forEach(function(s) {
 					s.activities = _.filter(activities, function(a) {
 						// Convert date time to Thai format
 						var visaStartDate = moment(s.person_visa_start_date, 'DD MMMM YYYY', 'en');
 						if (visaStartDate.isValid())
-							s.person_visa_start_date = visaStartDate.add(543, 'years').locale('th').format('D MMMM YYYY');
+							s.person_visa_start_date = changeThaiFormat(visaStartDate);
 
 						var visaExpireDate = moment(s.person_visa_expire_date, 'DD MMMM YYYY', 'en');
 						if (visaExpireDate.isValid())
-							s.person_visa_expire_date = visaExpireDate.add(543, 'years').locale('th').format('D MMMM YYYY');
+							s.person_visa_expire_date = changeThaiFormat(visaExpireDate);
 
 						return s.person_id == a.person_id;
 					});
 				});
 
-				_.remove(staffs.staffs, function(s) {
+				_.remove(data.staffs, function(s) {
 					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
 				});
 
@@ -93,7 +140,7 @@ module.exports = {
 				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function(err, content) {
 					var docx = new DocxGen()
 						.load(content)
-						.setData(staffs).render();
+						.setData(data).render();
 
 					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
 
@@ -119,7 +166,6 @@ module.exports = {
 				});
 
 				res.send(buff);
-				// ADCore.comm.success(res, staffs.staffs);
 			}
 		});
 	},
@@ -128,7 +174,7 @@ module.exports = {
 	acitivity_images: function(req, res) {
 		AD.log('<green>::: docxtemplate.acitivity_images() :::</green>');
 
-		var staffs = { staffs: null };
+		var data = { staffs: null };
 		var activity_images;
 		var resultBuffer;
 
@@ -143,10 +189,10 @@ module.exports = {
 							send: function(result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
-									staffs.staffs = r.data;
+									data.staffs = r.data;
 
 									// For TEST: reduce number staffs
-									staffs.staffs = staffs.staffs.slice(0, 5);
+									data.staffs = data.staffs.slice(0, 5);
 								}
 
 								callback();
@@ -188,7 +234,7 @@ module.exports = {
 						img.activity_image_caption_right_column = '';
 				});
 
-				staffs.staffs.forEach(function(s, index) {
+				data.staffs.forEach(function(s, index) {
 					var activities = _.filter(activity_images, function(img) {
 						return img.person_id == s.person_id;
 					});
@@ -241,7 +287,7 @@ module.exports = {
 				});
 
 				// Remove staffs who don't have any activities
-				_.remove(staffs.staffs, function(s) {
+				_.remove(data.staffs, function(s) {
 					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
 				});
 
