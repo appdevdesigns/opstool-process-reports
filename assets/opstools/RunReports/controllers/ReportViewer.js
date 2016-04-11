@@ -188,7 +188,17 @@ steal(
 
 								$('.rp-run-report-export-docx').bind('click', function(e) {
 									e.preventDefault();
-									window.location.href = reportTemplate.getDocxUrl;
+
+									var filter = '';
+									$(".jsreports-input").each(function(index) {
+										var value = $(this).find('input').val();
+										if (value) {
+											var name = $(this).text().split(':')[0];
+											filter += name + '=' + value + '&';
+										}
+									});
+
+									window.location.href = reportTemplate.getDocxUrl + (filter ? '?' + filter : '');
 								});
 
 								_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.rp-runreport-preview'));
