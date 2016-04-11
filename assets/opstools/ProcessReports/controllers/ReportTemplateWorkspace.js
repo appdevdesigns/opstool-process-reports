@@ -267,10 +267,7 @@ steal(
 							data_sources = [],
 							datasets = [];
 
-						// Find data source schema
-						var data_schema = this.findDataSchema(report_def.body.data_source);
-
-						if (!data_schema || !data_schema.fields) {
+						if (!report_def.body.data_source) {
 							alert('Please select the data source');
 							return;
 						}
