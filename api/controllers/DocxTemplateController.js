@@ -196,7 +196,7 @@ module.exports = {
 									data.staffs = r.data;
 
 									// For TEST: reduce number staffs
-									data.staffs = data.staffs.slice(0, 5);
+									data.staffs = data.staffs.slice(0, 15);
 								}
 
 								callback();
