@@ -275,6 +275,12 @@ module.exports = {
 
 					if (!img.activity_image_caption_right_column)
 						img.activity_image_caption_right_column = '';
+
+					if (!img.activity_image_caption_govt_left_column)
+						img.activity_image_caption_govt_left_column = '';
+
+					if (!img.activity_image_caption_govt_right_column)
+						img.activity_image_caption_govt_right_column = '';
 				});
 
 				data.staffs.forEach(function(s, index) {
@@ -295,6 +301,8 @@ module.exports = {
 
 						r.activity_name = current[0].activity_name;
 						r.activity_description = current[0].activity_description;
+						r.activity_name_govt = current[0].activity_name_govt;
+						r.activity_description_govt = current[0].activity_description_govt;
 						r.images = _.map(current, function(img) {
 							var image = {};
 
@@ -313,6 +321,16 @@ module.exports = {
 								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
 							else
 								image.activity_image_caption_right_column = '';
+
+							if (img.activity_image_caption_govt_left_column)
+								image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
+							else
+								image.activity_image_caption_govt_left_column = '';
+
+							if (img.activity_image_caption_govt_right_column)
+								image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
+							else
+								image.activity_image_caption_govt_right_column = '';
 
 							// Show page header
 							if (!r.activity_has_header && (image_row_number === 1 || (image_row_number - 1) % 2 === 0))
