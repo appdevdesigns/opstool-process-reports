@@ -43,6 +43,8 @@ module.exports = {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
 									data.staffs = r.data;
+
+									data.staffs = data.staffs.concat(data.staffs);
 								}
 
 								callback();
@@ -112,18 +114,25 @@ module.exports = {
 				}
 
 				data.staffs.forEach(function(s) {
+					// Convert date time to Thai format
+					var visaStartDate = moment(s.person_visa_start_date, 'DD MMMM YYYY', 'en');
+					if (visaStartDate.isValid())
+						s.person_visa_start_date = changeThaiFormat(visaStartDate);
+
+					var visaExpireDate = moment(s.person_visa_expire_date, 'DD MMMM YYYY', 'en');
+					if (visaExpireDate.isValid())
+						s.person_visa_expire_date = changeThaiFormat(visaExpireDate);
+
 					s.activities = _.filter(activities, function(a) {
-						// Convert date time to Thai format
-						var visaStartDate = moment(s.person_visa_start_date, 'DD MMMM YYYY', 'en');
-						if (visaStartDate.isValid())
-							s.person_visa_start_date = changeThaiFormat(visaStartDate);
-
-						var visaExpireDate = moment(s.person_visa_expire_date, 'DD MMMM YYYY', 'en');
-						if (visaExpireDate.isValid())
-							s.person_visa_expire_date = changeThaiFormat(visaExpireDate);
-
 						return s.person_id == a.person_id;
 					});
+
+					// Set activities order index
+					if (s.activities) {
+						s.activities.forEach(function(a, index) {
+							a.order = index + 1;
+						});
+					}
 				});
 
 				_.remove(data.staffs, function(s) {
