@@ -1,0 +1,102 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8"
+"Content-Transfer-Encoding: 8bit"
+
+#. #########################################
+#. Labels for context: opstool-ProcessReports
+#. Source language: en
+#. Target language: th
+#. #########################################
+
+
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.processreport.list.header
+msgid "Report Templates"
+msgstr "รายงาน"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.processreport.list.description
+msgid "Choose one of the report template to review"
+msgstr "เลือกรายงานเพื่อเริ่มการแก้ไข"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.processreport.instruction.selectOne
+msgid "Select an entry on the left to begin editing or"
+msgstr "เลือกรายงานที่บันทึกไว้ซึ่งอยู่ด้านซ้ายเพื่อเริ่มแก้ไข หรือ"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.processreport.reportname
+msgid "Report name"
+msgstr "ชื่อรายงาน"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.runreport.list.header
+msgid "Report Templates"
+msgstr "รายงาน"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.runreport.list.description
+msgid "Choose one of the report template to view"
+msgstr "เลือกรายงานเพื่อดูผลลัพท์"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.runreport.instruction.selectOne
+msgid "Select an entry on the left to view the report"
+msgstr "เลือกรายงานด้านซ้ายเพื่อดูผลลัพท์"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.create
+msgid "Create new report"
+msgstr "สร้างใหม่"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.edit
+msgid "Edit"
+msgstr "แก้ไข"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.preview
+msgid "Preview"
+msgstr "ดูตัวอย่าง"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.save
+msgid "Save"
+msgstr "บันทึก"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.delete
+msgid "Delete"
+msgstr "ลบ"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.close
+msgid "Close"
+msgstr "ปิด"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.buttons.cancel
+msgid "Cancel"
+msgstr "ยกเลิก"
+
+#. path: opstool-ProcessReports
+#. code: th
+#. key: rpreport.loading
+msgid "Loading..."
+msgstr "กำลังโหลดข้อมูล..."

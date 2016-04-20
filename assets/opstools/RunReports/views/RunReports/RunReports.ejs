@@ -4,8 +4,8 @@
 	<!--Left bar-->
 	<div class="op-container op-widget sticky rp-runreport-list">
 		<div class="op-widget-masthead">
-			<h3><strong app-label-key="rp.runreportlist.header">Report Templates</strong></h3>
-			<p app-label-key="rp.runreportlist.description">Choose one of the report template to view</p>
+			<h3><strong app-label-key="rpreport.runreport.list.header">Report Templates</strong></h3>
+			<p app-label-key="rpreport.runreport.list.description">Choose one of the report template to view</p>
 		</div>
 		<div class="op-widget-body">
 			<ul class="op-list">
@@ -34,17 +34,17 @@
 <div class='col-xs-10'>
 	<div class="rp-runreport-display op-container">
 		<div class="rp-runreport-instructionsPanel mockup-display new-activity opsportal-content-area">
-			<p app-label-key="rp..runreport.instruction.selectOne"> Select an entry on the left to view the report
+			<p app-label-key="rpreport.runreport.instruction.selectOne"> Select an entry on the left to view the report
 			</p>
 		</div>
 		<div class="rp-runreport-loading mockup-display new-activity opsportal-content-area">
-			<p>Loading...</p>
+			<p app-label-key="rpreport.loading">Loading...</p>
 		</div>
 		<div class="rp-runreport-preview-panel op-widget">
 			<div class="rp-runreport-preview op-widget-body">
 			</div>
 			<div class="rp-runreport-button pull-right op-container nobgcolor op-margin-top">
-				<button app-label-key="rpreport.runreport.buttons.edit" class="rp-runreport-edit btn btn-success offset-15" type="submit"><i class="fa"></i>Edit</button>
+				<button class="rp-runreport-edit btn btn-success offset-15" type="submit"><i class="fa"></i><span app-label-key="rpreport.buttons.edit">Edit</span></button>
 			</div>
 		</div>
 
@@ -56,8 +56,8 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="rp-runreport-save btn btn-success" data-dismiss="modal">Save</button>
-						<button type="button" class="btn btn-warning" data-dismiss="modal">Close</button>
+						<button type="button" class="rp-runreport-save btn btn-success" data-dismiss="modal" app-label-key="rpreport.buttons.save">Save</button>
+						<button type="button" class="btn btn-warning" data-dismiss="modal" app-label-key="rpreport.buttons.close">Close</button>
 					</div>
 				</div>
 			</div>

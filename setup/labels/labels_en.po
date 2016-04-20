@@ -1,0 +1,102 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8"
+"Content-Transfer-Encoding: 8bit"
+
+#. #########################################
+#. Labels for context: opstool-ProcessReports
+#. Source language: en
+#. Target language: en
+#. #########################################
+
+
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.processreport.list.header
+msgid "Report Templates"
+msgstr "Report Templates"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.processreport.list.description
+msgid "Choose one of the report template to review"
+msgstr "Choose one of the report template to review"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.processreport.instruction.selectOne
+msgid "Select an entry on the left to begin editing or"
+msgstr "Select an entry on the left to begin editing or"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.processreport.reportname
+msgid "Report name"
+msgstr "Report name"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.runreport.list.header
+msgid "Report Templates"
+msgstr "Report Templates"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.runreport.list.description
+msgid "Choose one of the report template to view"
+msgstr "Choose one of the report template to view"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.runreport.instruction.selectOne
+msgid "Select an entry on the left to view the report"
+msgstr "Select an entry on the left to view the report"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.create
+msgid "Create new report"
+msgstr "Create new report"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.edit
+msgid "Edit"
+msgstr "Edit"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.preview
+msgid "Preview"
+msgstr "Preview"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.save
+msgid "Save"
+msgstr "Save"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.delete
+msgid "Delete"
+msgstr "Delete"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.close
+msgid "Close"
+msgstr "Close"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.buttons.cancel
+msgid "Cancel"
+msgstr "Cancel"
+
+#. path: opstool-ProcessReports
+#. code: en
+#. key: rpreport.loading
+msgid "Loading..."
+msgstr "Loading..."
