@@ -16,7 +16,8 @@ steal(
 						var self = this;
 						options = AD.defaults({
 							eventItemSaved: 'RP_ReportTemplate.Saved',
-							eventClearItemSelected: 'RP_ReportTemplate.ClearSelected'
+							eventClearItemSelected: 'RP_ReportTemplate.ClearSelected',
+							eventPopulateFinished: 'RP_ReportTemplate.Finished'
 						}, options);
 						this.options = options;
 
@@ -110,6 +111,8 @@ steal(
 							this.resize(this.data.screenHeight);
 							this.dom.designer.window_resize_delegate();
 						}
+
+						this.element.trigger(this.options.eventPopulateFinished);
 					},
 
 

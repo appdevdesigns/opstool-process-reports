@@ -17,7 +17,8 @@ steal(
 							var self = this;
 							options = AD.defaults({
 								eventItemSelected: 'RP_ReportTemplate.Selected',
-								eventCreateReport: 'RP_ReportTemplate.CreateClicked'
+								eventCreateReport: 'RP_ReportTemplate.CreateClicked',
+								eventPopuplateListFinished: 'RP_ReportTemplate.List.Finished'
 							}, options);
 							this.options = options;
 

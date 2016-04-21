@@ -1,6 +1,6 @@
 
 steal(
-// List your Controller's dependencies here:
+	// List your Controller's dependencies here:
 	'opstools/ProcessReports/models/RPReportDefinition.js',
 
 	'opstools/ProcessReports/controllers/ReportTemplatesList.js',
@@ -12,14 +12,16 @@ steal(
 			steal.import(
 				'appdev/ad',
 				'appdev/control/control',
-				'OpsPortal/classes/OpsTool').then(function () {
-					
+				'OpsPortal/classes/OpsTool',
+				'site/labels/opstool-ProcessReports').then(function () {
+
 					// Namespacing conventions:
 					// AD.Control.OpsTool.extend('[application].[controller]', [{ static },] {instance} );
 					AD.Control.OpsTool.extend('ProcessReports', {
 						CONST: {
 							ITEM_SELECTED: 'RP_ReportTemplate.Selected',
 							ITEM_SAVED: 'RP_ReportTemplate.Saved',
+							POPULATE_FINISHED: 'RP_ReportTemplate.Finished',
 							CLEAR_ITEM_SELECTED: 'RP_ReportTemplate.ClearSelected',
 							CLICK_CREATE_REPORT: 'RP_ReportTemplate.CreateClicked'
 						},
@@ -47,6 +49,7 @@ steal(
 							this.initEvents();
 							this.loadReportTemplatesData();
 
+							this.translate();
 						},
 
 
@@ -72,15 +75,16 @@ steal(
 									eventItemSelected: this.CONST.ITEM_SELECTED,
 									eventCreateReport: this.CONST.CLICK_CREATE_REPORT
 								}
-								);
+							);
 
 							this.controllers.ReportTemplateWorkspace = new ReportTemplateWorkspace(
 								this.element.find('.rp-reportworkspace'),
 								{
 									eventItemSaved: this.CONST.ITEM_SAVED,
-									eventClearItemSelected: this.CONST.CLEAR_ITEM_SELECTED
+									eventClearItemSelected: this.CONST.CLEAR_ITEM_SELECTED,
+									eventPopulateFinished: this.CONST.POPULATE_FINISHED
 								}
-								);
+							);
 
 						},
 
@@ -91,6 +95,7 @@ steal(
 
 							this.controllers.ReportTemplatesList.element.on(this.CONST.ITEM_SELECTED, function (event, reportTemplate) {
 								_this.controllers.ReportTemplateWorkspace.setReportTemplate(reportTemplate);
+								_this.translate();
 							});
 
 							this.controllers.ReportTemplatesList.element.on(this.CONST.CLICK_CREATE_REPORT, function (event, reportTemplate) {
@@ -118,6 +123,10 @@ steal(
 								_this.controllers.ReportTemplatesList.clearSelectItems();
 							});
 
+							this.controllers.ReportTemplateWorkspace.element.on(this.CONST.POPULATE_FINISHED, function () {
+								_this.translate();
+							});
+
 							AD.comm.socket.subscribe('RPReportDefinition', function (message, data) {
 								if (data.verb === 'created' || data.verb === 'updated' || data.verb === 'destroyed')
 									_this.loadReportTemplatesData();
@@ -137,6 +146,8 @@ steal(
 									_this.controllers.ReportTemplatesList.setList(list);
 
 									_this.data.list = list;
+									
+									_this.translate();
 								});
 						},
 

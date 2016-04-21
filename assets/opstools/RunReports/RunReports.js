@@ -4,6 +4,5 @@ steal(
 	'opstools/RunReports/controllers/RunReports.js',
 	function() {
 		System.import('jsreports-all').then(function() {
-			steal.import('site/labels/opstool-RunReports').then(function() { });
 		});
 	});

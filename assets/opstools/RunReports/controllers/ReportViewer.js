@@ -2,23 +2,24 @@
 steal(
 	'opstools/ProcessReports/models/RPDataSource.js',
 
-	function() {
-		System.import('appdev').then(function() {
+	function () {
+		System.import('appdev').then(function () {
 			steal.import(
 				'appdev/ad',
 				'appdev/control/control',
 				'appdev/model/model',
 				'appdev/comm/service'
-			).then(function() {
+			).then(function () {
 
 				// Namespacing conventions:
 				// AD.Control.extend('[application].[controller]', [{ static },] {instance} );
 				AD.Control.extend('opstools.RunReports.ReportViewer', {
 
 
-					init: function(element, options) {
+					init: function (element, options) {
 						var self = this;
 						options = AD.defaults({
+							eventPopulateFinished: 'RP_RunReport.Finished'
 						}, options);
 						this.options = options;
 
@@ -36,7 +37,7 @@ steal(
 						this.loadReportDataSource();
 					},
 
-					initDOM: function() {
+					initDOM: function () {
 						this.dom = {};
 
 						this.dom.ViewWidget = new AD.op.Widget(this.element.find('.rp-runreport-preview'));
@@ -48,7 +49,7 @@ steal(
 						this.dom.modalPreview.modal('hide');
 					},
 
-					setReportViewer: function(reportTemplate) {
+					setReportViewer: function (reportTemplate) {
 						this.element.find('.rp-runreport-loading').show();
 						this.element.find('.rp-runreport-instructionsPanel').hide();
 						this.element.find('.rp-runreport-preview-panel').hide();
@@ -65,7 +66,7 @@ steal(
 
 						// Find subreport data source info
 						if (report_def.body.elements && report_def.body.elements.length > 0) {
-							report_def.body.elements.forEach(function(elm) {
+							report_def.body.elements.forEach(function (elm) {
 								if (elm.type === 'subreport') {
 									data_source_ids.push({ id: elm.report.body.data_source });
 								}
@@ -74,22 +75,22 @@ steal(
 
 						async.series(
 							[
-								function(next) {
+								function (next) {
 									// Get data sources info
-									_this.RPDataSource.findAll({ or: data_source_ids }).then(function(ds) {
+									_this.RPDataSource.findAll({ or: data_source_ids }).then(function (ds) {
 										data_sources = ds;
 
 										next();
 									});
 								},
-								function(next) {
+								function (next) {
 									var getJoinDsTasks = [];
 
 									// Find Join data source object
-									data_sources.forEach(function(ds) {
+									data_sources.forEach(function (ds) {
 										if (ds.join) {
-											getJoinDsTasks.push(function(callback) {
-												_this.RPDataSource.findAll({ or: [{ id: ds.join.left }, { id: ds.join.right }] }).then(function(ds) {
+											getJoinDsTasks.push(function (callback) {
+												_this.RPDataSource.findAll({ or: [{ id: ds.join.left }, { id: ds.join.right }] }).then(function (ds) {
 													data_sources = data_sources.concat(ds);
 
 													callback();
@@ -98,12 +99,12 @@ steal(
 										}
 									});
 
-									async.parallel(getJoinDsTasks, function() {
+									async.parallel(getJoinDsTasks, function () {
 										// Unique data sources
 										var data_source_ids = {};
 										var unique_ids = [];
 
-										$.each(data_sources, function(i, ds) {
+										$.each(data_sources, function (i, ds) {
 											if (!data_source_ids[ds.id]) {
 												data_source_ids[ds.id] = true;
 												unique_ids.push(ds);
@@ -114,11 +115,11 @@ steal(
 										next();
 									});
 								},
-								function(next) {
+								function (next) {
 									var getDataSourcesTasks = [];
 
 									// Get data to render report
-									data_sources.forEach(function(ds) {
+									data_sources.forEach(function (ds) {
 										if (ds.join) {
 											datasets.push({
 												"id": ds.id.toString(),
@@ -127,8 +128,8 @@ steal(
 											});
 										}
 										else {
-											getDataSourcesTasks.push(function(callback) {
-												AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {
+											getDataSourcesTasks.push(function (callback) {
+												AD.comm.service.get({ url: ds.getDataUrl }, function (err, data) {
 
 													datasets.push({
 														"id": ds.id.toString(),
@@ -143,12 +144,12 @@ steal(
 										}
 									});
 
-									async.parallel(getDataSourcesTasks, function() {
+									async.parallel(getDataSourcesTasks, function () {
 										next();
 									});
 								}
 							],
-							function() {
+							function () {
 								_this.element.find('.rp-runreport-preview-panel').show();
 								_this.element.find('.rp-runreport-loading').hide();
 
@@ -170,7 +171,7 @@ steal(
 									$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-docx rp-run-report-export-docx">Docx</a></li>');
 								}
 
-								$('.rp-run-report-export-html').bind('click', function() {
+								$('.rp-run-report-export-html').bind('click', function () {
 									// Get report html format
 									var html = _this.getReportHtml();
 
@@ -186,11 +187,11 @@ steal(
 									downloadLink.dispatchEvent(clickEvent);
 								});
 
-								$('.rp-run-report-export-docx').bind('click', function(e) {
+								$('.rp-run-report-export-docx').bind('click', function (e) {
 									e.preventDefault();
 
 									var filter = '';
-									$(".jsreports-input").each(function(index) {
+									$(".jsreports-input").each(function (index) {
 										var value = $(this).find('input').val();
 										if (value) {
 											var name = $(this).text().split(':')[0];
@@ -212,11 +213,11 @@ steal(
 
 					},
 
-					getReportHtml: function() {
+					getReportHtml: function () {
 						var selector = '.rp-runreport-preview .jsr-content-viewport';
 						var html = '<div class="jsr-report">' + $(selector).html() + '</div>';
 
-						selector = selector.split(",").map(function(subselector) {
+						selector = selector.split(",").map(function (subselector) {
 							return subselector + "," + subselector + " *";
 						}).join(",");
 
@@ -237,7 +238,7 @@ steal(
 							}
 						}
 
-						var style = rulesUsed.map(function(cssRule) {
+						var style = rulesUsed.map(function (cssRule) {
 							var cssText = '';
 							if (cssRule.style) {
 								cssText = cssRule.style.cssText.toLowerCase();
@@ -251,22 +252,22 @@ steal(
 						return "<html><head><meta charset='UTF-8'><style>\n" + style + "\n</style></head>\n\n<body>" + html + "</body></html>";
 					},
 
-					loadReportDataSource: function() {
+					loadReportDataSource: function () {
 						var _this = this;
 
 						this.RPDataSource.findAll()
-							.fail(function(err) {
+							.fail(function (err) {
 								console.error('!!! Dang.  something went wrong:', err);
 							})
-							.then(function(dataSources) {
+							.then(function (dataSources) {
 								_this.data.dataSources = dataSources.attr(); // Convert to array
-								_this.data.dataSources.forEach(function(ds) {
+								_this.data.dataSources.forEach(function (ds) {
 									ds.id = ds.id.toString(); // jsReports support only id string
 								});
 							});
 					},
 
-					resize: function(height) {
+					resize: function (height) {
 						this.data.screenHeight = height;
 
 						if (this.dom.ViewWidget) {
@@ -275,7 +276,7 @@ steal(
 						}
 					},
 
-					'.rp-runreport-edit click': function($el, ev) {
+					'.rp-runreport-edit click': function ($el, ev) {
 						var report_def = (typeof this.data.reportTemplate.report_def === 'string') ? JSON.parse(this.data.reportTemplate.report_def.replace(/'/g, '"')) : this.data.reportTemplate.report_def.attr();
 
 						this.dom.designer = new jsreports.Designer({
@@ -296,14 +297,14 @@ steal(
 						this.dom.modalPreview.modal('show');
 					},
 
-					'.rp-runreport-save click': function($el, ev) {
+					'.rp-runreport-save click': function ($el, ev) {
 						var _this = this;
 
 						var report_def = JSON.stringify(this.dom.designer.getReport());
 						this.data.reportTemplate.attr('report_def', report_def);
 
-						this.data.reportTemplate.save().then(function() {
-							_this.RPReportDefinition.findOne({ id: _this.data.reportTemplate.id }).then(function(reportTemplate) {
+						this.data.reportTemplate.save().then(function () {
+							_this.RPReportDefinition.findOne({ id: _this.data.reportTemplate.id }).then(function (reportTemplate) {
 								_this.data.reportTemplate = reportTemplate;
 
 								_this.setReportViewer(_this.data.reportTemplate);

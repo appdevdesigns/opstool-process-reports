@@ -100,3 +100,4 @@ msgstr "ยกเลิก"
 #. key: rpreport.loading
 msgid "Loading..."
 msgstr "กำลังโหลดข้อมูล..."
+

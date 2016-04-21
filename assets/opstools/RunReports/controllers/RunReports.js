@@ -1,6 +1,6 @@
 
 steal(
-// List your Controller's dependencies here:
+	// List your Controller's dependencies here:
 	'opstools/ProcessReports/models/RPReportDefinition.js',
 
 	'opstools/RunReports/controllers/ReportTemplatesList.js',
@@ -12,13 +12,15 @@ steal(
 			steal.import(
 				'appdev/ad',
 				'appdev/control/control',
-				'OpsPortal/classes/OpsTool').then(function () {
+				'OpsPortal/classes/OpsTool',
+				'site/labels/opstool-RunReports').then(function () {
 
 					// Namespacing conventions:
 					// AD.Control.OpsTool.extend('[ToolName]', [{ static },] {instance} );
 					AD.Control.OpsTool.extend('RunReports', {
 						CONST: {
-							ITEM_SELECTED: 'RP_RunReport.Selected'
+							ITEM_SELECTED: 'RP_RunReport.Selected',
+							POPULATE_FINISHED: 'RP_RunReport.Finished'
 						},
 
 						init: function (element, options) {
@@ -58,7 +60,7 @@ steal(
 
 							this.controllers.ReportTemplatesList = new ReportTemplatesList(this.element.find('.rp-runreport-list'), { eventItemSelected: this.CONST.ITEM_SELECTED });
 
-							this.controllers.ReportViewer = new ReportViewer(this.element.find('.rp-runreport-display'), {});
+							this.controllers.ReportViewer = new ReportViewer(this.element.find('.rp-runreport-display'), { eventPopulateFinished: this.CONST.POPULATE_FINISHED });
 						},
 
 						initEvents: function () {
@@ -70,6 +72,11 @@ steal(
 
 							this.controllers.ReportTemplatesList.element.on(this.CONST.ITEM_SELECTED, function (event, reportTemplate) {
 								_this.controllers.ReportViewer.setReportViewer(reportTemplate);
+								_this.translate();
+							});
+
+							this.controllers.ReportViewer.element.on(this.CONST.POPULATE_FINISHED, function () {
+								_this.translate();
 							});
 						},
 
@@ -84,6 +91,8 @@ steal(
 									_this.controllers.ReportTemplatesList.setList(list);
 
 									_this.data.list = list;
+
+									_this.translate();
 								});
 						},
 
