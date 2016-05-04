@@ -14,13 +14,16 @@ var AD = require('ad-utils'),
 	sizeOf = require('image-size'),
 	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js');
 
-function changeThaiFormat(momentDate) {
-	return momentDate.add(543, 'years').locale('th').format('D MMMM YYYY');
+function changeThaiFormat(momentDate, format) {
+	if (!format)
+		format = 'D MMMM YYYY';
+
+	return momentDate.add(543, 'years').locale('th').format(format);
 }
 
 module.exports = {
 	// /opstool-process-reports/docxtemplate/activities
-	activities: function(req, res) {
+	activities: function (req, res) {
 		AD.log('<green>::: docxtemplate.activities() :::</green>');
 
 		var data = { staffs: null };
@@ -34,12 +37,12 @@ module.exports = {
 		async.series([
 
 			// Get data
-			function(next) {
+			function (next) {
 				async.parallel([
 					// Get staffs data
-					function(callback) {
+					function (callback) {
 						var temp_res = {
-							send: function(result, code) {
+							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
 									data.staffs = r.data;
@@ -54,9 +57,9 @@ module.exports = {
 						renderReportController.staffs(req, temp_res);
 					},
 					// Get activity images data
-					function(callback) {
+					function (callback) {
 						var temp_res = {
-							send: function(result, code) {
+							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success')
 									activities = r.data;
@@ -67,16 +70,16 @@ module.exports = {
 
 						renderReportController.activities(req, temp_res);
 					}
-				], function(err) {
+				], function (err) {
 					next(err);
 				});
 			},
 
 			// Convert data to support docx template
-			function(next) {
+			function (next) {
 				// Staffs filter
 				if (staffName) {
-					_.remove(data.staffs, function(s) {
+					_.remove(data.staffs, function (s) {
 						return s.person_name.indexOf(staffName) < 1;
 					});
 				}
@@ -84,7 +87,7 @@ module.exports = {
 				// Activities start date filter
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
-					_.remove(activities, function(a) {
+					_.remove(activities, function (a) {
 						var actStartDateObj = moment(a.startDate);
 
 						if (!a.startDate || actStartDateObj < startDateObj)
@@ -94,13 +97,13 @@ module.exports = {
 					});
 
 					if (startDateObj.isValid())
-						data.startDate = changeThaiFormat(startDateObj)
+						data.startDate = changeThaiFormat(startDateObj, 'MMMM YYYY');
 				}
 
 				// Activities end date filter
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
-					_.remove(activities, function(a) {
+					_.remove(activities, function (a) {
 						var actEndDateObj = moment(a.endDate);
 
 						if (!a.endDate || (actEndDateObj.isValid() && actEndDateObj > endDateObj))
@@ -110,10 +113,10 @@ module.exports = {
 					});
 
 					if (endDateObj.isValid())
-						data.endDate = changeThaiFormat(endDateObj)
+						data.endDate = changeThaiFormat(endDateObj, 'MMMM YYYY');
 				}
 
-				data.staffs.forEach(function(s) {
+				data.staffs.forEach(function (s) {
 					// Convert date time to Thai format
 					var visaStartDate = moment(s.person_visa_start_date, 'DD MMMM YYYY', 'en');
 					if (visaStartDate.isValid())
@@ -123,19 +126,19 @@ module.exports = {
 					if (visaExpireDate.isValid())
 						s.person_visa_expire_date = changeThaiFormat(visaExpireDate);
 
-					s.activities = _.filter(activities, function(a) {
+					s.activities = _.filter(activities, function (a) {
 						return s.person_id == a.person_id;
 					});
 
 					// Set activities order index
 					if (s.activities) {
-						s.activities.forEach(function(a, index) {
+						s.activities.forEach(function (a, index) {
 							a.order = index + 1;
 						});
 					}
 				});
 
-				_.remove(data.staffs, function(s) {
+				_.remove(data.staffs, function (s) {
 					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
 				});
 
@@ -143,10 +146,10 @@ module.exports = {
 			},
 
 			// Generate docx file
-			function(next) {
+			function (next) {
 
 				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function(err, content) {
+				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function (err, content) {
 					var docx = new DocxGen()
 						.load(content)
 						.setData(data).render();
@@ -157,7 +160,7 @@ module.exports = {
 				});
 			}
 
-		], function(err, r) {
+		], function (err, r) {
 
 			if (err) {
 
@@ -180,7 +183,7 @@ module.exports = {
 	},
 
 	// /opstool-process-reports/docxtemplate/acitivity_images
-	acitivity_images: function(req, res) {
+	acitivity_images: function (req, res) {
 		AD.log('<green>::: docxtemplate.acitivity_images() :::</green>');
 
 		var data = { staffs: null };
@@ -194,12 +197,12 @@ module.exports = {
 		async.series([
 
 			// Get data
-			function(next) {
+			function (next) {
 				async.parallel([
 					// Get staffs data
-					function(callback) {
+					function (callback) {
 						var temp_res = {
-							send: function(result, code) {
+							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
 									data.staffs = r.data;
@@ -215,9 +218,9 @@ module.exports = {
 						renderReportController.staffs(req, temp_res);
 					},
 					// Get activity images data
-					function(callback) {
+					function (callback) {
 						var temp_res = {
-							send: function(result, code) {
+							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success')
 									activity_images = r.data;
@@ -228,16 +231,16 @@ module.exports = {
 
 						renderReportController.acitivity_images(req, temp_res);
 					}
-				], function(err) {
+				], function (err) {
 					next(err);
 				});
 			},
 
 			// Convert data to support docx template
-			function(next) {
+			function (next) {
 				// Staffs filter
 				if (staffName) {
-					data.staffs = _.filter(data.staffs, function(s) {
+					data.staffs = _.filter(data.staffs, function (s) {
 						return s.person_name.indexOf(staffName) > -1 || s.person_name_en.indexOf(staffName) > -1;
 					});
 				}
@@ -245,7 +248,7 @@ module.exports = {
 				// Activities start date filter
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
-					_.remove(activity_images, function(a) {
+					_.remove(activity_images, function (a) {
 						var actStartDateObj = moment(a.activity_start_date);
 
 						if (!a.activity_start_date || actStartDateObj < startDateObj)
@@ -261,7 +264,7 @@ module.exports = {
 				// Activities end date filter
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
-					_.remove(activity_images, function(a) {
+					_.remove(activity_images, function (a) {
 						var actEndDateObj = moment(a.acitivity_end_date);
 
 						if (!a.acitivity_end_date || (actEndDateObj.isValid() && actEndDateObj > endDateObj))
@@ -275,7 +278,7 @@ module.exports = {
 				}
 
 				// Delete null value properties
-				activity_images.forEach(function(img, index) {
+				activity_images.forEach(function (img, index) {
 					if (!img.activity_image_file_name_right_column || img.activity_image_file_name_right_column === 'blank.jpg')
 						delete img['activity_image_file_name_right_column'];
 
@@ -292,8 +295,8 @@ module.exports = {
 						img.activity_image_caption_govt_right_column = '';
 				});
 
-				data.staffs.forEach(function(s, index) {
-					var activities = _.filter(activity_images, function(img) {
+				data.staffs.forEach(function (s, index) {
+					var activities = _.filter(activity_images, function (img) {
 						return img.person_id == s.person_id;
 					});
 
@@ -301,7 +304,7 @@ module.exports = {
 					var groupedActivities = _.groupBy(activities, 'activity_id');
 
 					var image_row_number = 0;
-					s.activities = _.transform(groupedActivities, function(result, current) {
+					s.activities = _.transform(groupedActivities, function (result, current) {
 						var r = {};
 
 						// Show page header
@@ -312,7 +315,7 @@ module.exports = {
 						r.activity_description = current[0].activity_description;
 						r.activity_name_govt = current[0].activity_name_govt;
 						r.activity_description_govt = current[0].activity_description_govt;
-						r.images = _.map(current, function(img) {
+						r.images = _.map(current, function (img) {
 							var image = {};
 
 							if (img.activity_image_file_name_left_column)
@@ -357,7 +360,7 @@ module.exports = {
 				});
 
 				// Remove staffs who don't have any activities
-				_.remove(data.staffs, function(s) {
+				_.remove(data.staffs, function (s) {
 					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
 				});
 
@@ -368,11 +371,11 @@ module.exports = {
 			},
 
 			// Generate docx file
-			function(next) {
+			function (next) {
 
 				var imageModule = new DocxImageModule({
 					centered: false,
-					getImage: function(tagValue, tagName) {
+					getImage: function (tagValue, tagName) {
 						try {
 							if ((tagName === 'activity_image_file_name_left_column' || tagName === 'activity_image_file_name_right_column') && tagValue) {
 								// Get image binary
@@ -384,7 +387,7 @@ module.exports = {
 							console.log('err: ', err);
 						}
 					},
-					getSize: function(imgBuffer, tagValue, tagName) {
+					getSize: function (imgBuffer, tagValue, tagName) {
 						if (imgBuffer) {
 							var maxWidth = 300;
 							var maxHeight = 160;
@@ -402,7 +405,7 @@ module.exports = {
 				});
 
 				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activity images template.docx", "binary", function(err, content) {
+				fs.readFile(__dirname + "/../../docx templates/activity images template.docx", "binary", function (err, content) {
 					var docx = new DocxGen()
 						.attachModule(imageModule)
 						.load(content)
@@ -413,7 +416,7 @@ module.exports = {
 					next();
 				});
 			}
-		], function(err, r) {
+		], function (err, r) {
 
 			if (err) {
 
