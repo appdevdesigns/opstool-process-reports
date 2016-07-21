@@ -12,14 +12,105 @@ var AD = require('ad-utils'),
 	DocxGen = require('docxtemplater'),
 	DocxImageModule = require('docxtemplater-image-module'),
 	sizeOf = require('image-size'),
+	exif = require('exif-parser'),
+	jpegjs = require('jpeg-js'),
 	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js');
 
-function changeThaiFormat(momentDate, format) {
+var changeThaiFormat = function (momentDate, format) {
 	if (!format)
 		format = 'D MMMM YYYY';
 
 	return momentDate.add(543, 'years').locale('th').format(format);
 }
+
+var _autoOrient = function (buffer) {
+	// Get Exif info
+	var exifMetaData = exif.create(buffer).parse();
+
+	if (exifMetaData.tags.Orientation === 1 || typeof exifMetaData.tags.Orientation === 'undefined')
+		return buffer;
+
+	try {
+		var jpeg = jpegjs.decode(buffer);
+	}
+	catch (error) {
+		return;
+	}
+	var new_buffer = jpeg.data;
+
+	var transformations = {
+		2: { rotate: 0, flip: true },
+		3: { rotate: 180, flip: false },
+		4: { rotate: 180, flip: true },
+		5: { rotate: 90, flip: true },
+		6: { rotate: 90, flip: false },
+		7: { rotate: 270, flip: true },
+		8: { rotate: 270, flip: false }
+	};
+
+	var orientation = exifMetaData.tags.Orientation;
+	if (transformations[orientation].rotate > 0) {
+		new_buffer = _rotate(new_buffer, jpeg.width, jpeg.height, transformations[orientation].rotate);
+	}
+	if (transformations[orientation].flip) {
+		new_buffer = _flip(new_buffer, jpeg.width, jpeg.height);
+	}
+	var width = orientation < 5 ? jpeg.width : jpeg.height;
+	var height = orientation < 5 ? jpeg.height : jpeg.width;
+	var quality = 80;
+
+	var new_jpeg = jpegjs.encode({ data: new_buffer, width: width, height: height }, quality);
+
+	return new_jpeg.data;
+}
+
+/**
+ * Rotates a buffer (degrees must be a multiple of 90)
+ * @param buffer
+ * @param width
+ * @param height
+ * @param degrees
+ */
+var _rotate = function (buffer, width, height, degrees) {
+    var loops = degrees / 90;
+    while (loops > 0) {
+        var new_buffer = new Buffer(buffer.length);
+        var new_offset = 0;
+        for (var x = 0; x < width; x += 1) {
+            for (var y = height - 1; y >= 0; y -= 1) {
+                var offset = (width * y + x) << 2;
+                var pixel = buffer.readUInt32BE(offset, true);
+                new_buffer.writeUInt32BE(pixel, new_offset, true);
+                new_offset += 4;
+            }
+        }
+        buffer = new_buffer;
+        var new_height = width;
+        width = height;
+        height = new_height;
+        loops -= 1;
+    }
+    return buffer;
+};
+
+/**
+ * Flips a buffer horizontally
+ * @param buffer
+ * @param width
+ * @param height
+ */
+var _flip = function (buffer, width, height) {
+    var new_buffer = new Buffer(buffer.length);
+    for (var x = 0; x < width; x += 1) {
+        for (var y = 0; y < height; y += 1) {
+            var offset = (width * y + x) << 2;
+            var new_offset = (width * y + width - 1 - x) << 2;
+            var pixel = buffer.readUInt32BE(offset, true);
+            new_buffer.writeUInt32BE(pixel, new_offset, true);
+        }
+    }
+    return new_buffer;
+};
 
 module.exports = {
 	// /opstool-process-reports/docxtemplate/activities
@@ -279,19 +370,19 @@ module.exports = {
 
 				// Delete null value properties
 				activity_images.forEach(function (img, index) {
-					if (!img.activity_image_file_name_right_column || img.activity_image_file_name_right_column === 'blank.jpg')
+					if (typeof img.activity_image_file_name_right_column === 'undefined' || img.activity_image_file_name_right_column === null || img.activity_image_file_name_right_column === 'blank.jpg')
 						delete img['activity_image_file_name_right_column'];
 
-					if (!img.activity_image_caption_left_column)
+					if (typeof img.activity_image_caption_left_column === 'undefined' || img.activity_image_caption_left_column === null)
 						img.activity_image_caption_left_column = '';
 
-					if (!img.activity_image_caption_right_column)
+					if (typeof img.activity_image_caption_right_column === 'undefined' || img.activity_image_caption_right_column === null)
 						img.activity_image_caption_right_column = '';
 
-					if (!img.activity_image_caption_govt_left_column)
+					if (typeof img.activity_image_caption_govt_left_column === 'undefined' || img.activity_image_caption_govt_left_column === null)
 						img.activity_image_caption_govt_left_column = '';
 
-					if (!img.activity_image_caption_govt_right_column)
+					if (typeof img.activity_image_caption_govt_right_column === 'undefined' || img.activity_image_caption_govt_right_column === null)
 						img.activity_image_caption_govt_right_column = '';
 				});
 
@@ -380,7 +471,11 @@ module.exports = {
 							if ((tagName === 'activity_image_file_name_left_column' || tagName === 'activity_image_file_name_right_column') && tagValue) {
 								// Get image binary
 								var imgContent = fs.readFileSync(__dirname + '/../../../../assets/data/fcf/images/activities/' + tagValue);
-								return imgContent;
+
+								// Auto rotate
+								var newImgContent = _autoOrient(imgContent);
+
+								return newImgContent;
 							}
 						}
 						catch (err) {

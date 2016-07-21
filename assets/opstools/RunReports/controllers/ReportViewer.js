@@ -130,15 +130,50 @@ steal(
 										else {
 											getDataSourcesTasks.push(function (callback) {
 												AD.comm.service.get({ url: ds.getDataUrl }, function (err, data) {
+													var rotateImageTasks = [];
 
-													datasets.push({
-														"id": ds.id.toString(),
-														"name": ds.name,
-														"data": data instanceof Array ? data : [data],
-														"schema": (typeof ds.schema === 'string' ? JSON.parse(ds.schema) : ds.schema.attr())
+													data = data instanceof Array ? data : [data];
+
+													data.forEach(function (d) {
+														if (d.activity_image_file_name_left_column) {
+															d.activity_image_file_name_left_column = '/data/fcf/images/activities/' + d.activity_image_file_name_left_column;
+
+															rotateImageTasks.push(function (cb) {
+																_this.rotateImage(d.activity_image_file_name_left_column)
+																	.fail(function (err) { cb(err) })
+																	.then(function (imgData) {
+																		d.activity_image_file_name_left_column = imgData;
+
+																		cb();
+																	});
+															});
+														}
+
+														if (d.activity_image_file_name_right_column) {
+															rotateImageTasks.push(function (cb) {
+																d.activity_image_file_name_right_column = '/data/fcf/images/activities/' + d.activity_image_file_name_right_column;
+
+																_this.rotateImage(d.activity_image_file_name_right_column)
+																	.fail(function (err) { cb(err) })
+																	.then(function (imgData) {
+																		d.activity_image_file_name_right_column = imgData;
+
+																		cb();
+																	});
+															});
+														}
 													});
 
-													callback();
+													async.parallel(rotateImageTasks, function () {
+														datasets.push({
+															"id": ds.id.toString(),
+															"name": ds.name,
+															"data": data,
+															"schema": (typeof ds.schema === 'string' ? JSON.parse(ds.schema) : ds.schema.attr())
+														});
+
+														callback();
+													});
 												});
 											});
 										}
@@ -211,6 +246,24 @@ steal(
 							}
 						);
 
+					},
+
+					rotateImage: function (image_file) {
+						var q = AD.sal.Deferred(),
+							img = new AD.op.Image($('<div></div>'), {});
+
+						img.loadURL(image_file, { shouldAppend: false })
+							.fail(function (err) { q.reject(err) })
+							.then(function (canvas) {
+								var imgData = image_file;
+
+								if (canvas.toDataURL)
+									imgData = canvas.toDataURL();
+
+								q.resolve(imgData);
+							});
+
+						return q;
 					},
 
 					getReportHtml: function () {
