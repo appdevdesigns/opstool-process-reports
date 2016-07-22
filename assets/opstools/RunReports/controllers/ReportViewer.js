@@ -8,7 +8,8 @@ steal(
 				'appdev/ad',
 				'appdev/control/control',
 				'appdev/model/model',
-				'appdev/comm/service'
+				'appdev/comm/service',
+				'appdev/sal/web-jquery',
 			).then(function () {
 
 				// Namespacing conventions:
