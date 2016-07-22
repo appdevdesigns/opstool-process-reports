@@ -9,7 +9,7 @@ steal(
 				'appdev/control/control',
 				'appdev/model/model',
 				'appdev/comm/service',
-				'appdev/sal/web-jquery',
+				'appdev/sal/web-jquery'
 			).then(function () {
 
 				// Namespacing conventions:
