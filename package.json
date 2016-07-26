@@ -25,9 +25,7 @@
     "ad-utils": "appdevdesigns/ad-utils#develop",
     "docxtemplater": "^2.1.0",
     "docxtemplater-image-module": "^1.0.0",
-    "exif-parser": "^0.1.9",
     "image-size": "^0.5.0",
-    "jpeg-js": "^0.2.0",
     "lodash": "^4.8.2",
     "moment": "^2.12.0"
   },

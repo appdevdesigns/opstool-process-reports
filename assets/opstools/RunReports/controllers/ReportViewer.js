@@ -131,40 +131,18 @@ steal(
 										else {
 											getDataSourcesTasks.push(function (callback) {
 												AD.comm.service.get({ url: ds.getDataUrl }, function (err, data) {
-													var rotateImageTasks = [];
-
 													data = data instanceof Array ? data : [data];
 
 													data.forEach(function (d) {
 														if (d.activity_image_file_name_left_column) {
 															d.activity_image_file_name_left_column = '/data/fcf/images/activities/' + d.activity_image_file_name_left_column;
-
-															// rotateImageTasks.push(function (cb) {
-															// 	_this.rotateImage(d.activity_image_file_name_left_column)
-															// 		.fail(function (err) { cb(err) })
-															// 		.then(function (imgData) {
-															// 			d.activity_image_file_name_left_column = imgData;
-
-															// 			cb();
-															// 		});
-															// });
 														}
 
 														if (d.activity_image_file_name_right_column) {
 															d.activity_image_file_name_right_column = '/data/fcf/images/activities/' + d.activity_image_file_name_right_column;
-															// rotateImageTasks.push(function (cb) {
-															// _this.rotateImage(d.activity_image_file_name_right_column)
-															// 	.fail(function (err) { cb(err) })
-															// 	.then(function (imgData) {
-															// 		d.activity_image_file_name_right_column = imgData;
-
-															// 		cb();
-															// 	});
-															// });
 														}
 													});
 
-													// async.parallel(rotateImageTasks, function () {
 													datasets.push({
 														"id": ds.id.toString(),
 														"name": ds.name,
@@ -173,7 +151,6 @@ steal(
 													});
 
 													callback();
-													// });
 												});
 											});
 										}
@@ -240,43 +217,12 @@ steal(
 								_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.rp-runreport-preview'));
 								_this.dom.ReportContentWidget = new AD.op.Widget(_this.element.find('.jsr-content-viewport'));
 
-								setTimeout(function () {
-									$.each($('.jsr-element.jsr-image'), function (index, imgDom) {
-										var url = $(imgDom).css('background-image');
-										if (url.indexOf('/data/fcf/images/activities/') < 0) return;
-
-										url = url.replace('url(', '').replace(')', '').replace(/"/g, '');
-										_this.rotateImage(url)
-											.then(function (imgData) {
-												$(imgDom).css("background-image", "url(" + imgData + ")");
-											});
-									});
-								}, 2500);
-
 								if (_this.data.screenHeight) {
 									_this.resize(_this.data.screenHeight);
 								}
 							}
 						);
 
-					},
-
-					rotateImage: function (image_file) {
-						var q = AD.sal.Deferred(),
-							img = new AD.op.Image($('<div></div>'), {});
-
-						img.loadURL(image_file, { shouldAppend: false })
-							.fail(function (err) { q.reject(err) })
-							.then(function (canvas) {
-								var imgData = image_file;
-
-								if (canvas.toDataURL)
-									imgData = canvas.toDataURL();
-
-								q.resolve(imgData);
-							});
-
-						return q;
 					},
 
 					getReportHtml: function () {
