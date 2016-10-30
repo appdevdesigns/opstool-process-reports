@@ -5,6 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var lockedItems = [];
+var _ = require('lodash');
 
 ADCore.queue.subscribe('opsportal.socket.disconnect', function (message, socket) {
     var socketId = socket.id;
