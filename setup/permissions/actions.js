@@ -30,12 +30,12 @@ module.exports = {
     actions:[
         { 
             action_key:'reports.tool.view', 
-            action_description:'Allows the user to access the Reports tool.' 
+            action_description:'Allow the user to create Reports.' 
         },
-        // { 
-        //     action_key:'[moduleName].action.create', 
-        //     action_description:'Allow user to create actions in [moduleName]' 
-        // }
+        { 
+            action_key:'reports.runner.view', 
+            action_description:'Allow the user to run Reports.' 
+        }
     ]
 
 };

@@ -6,11 +6,22 @@
 module.exports = [
 
     { 
-        key:'process.reports', 
+        key:'process.reports.create', 
         permissions:'reports.tool.view', 
         icon:'fa-print', 
         controller:'ProcessReports',
-        label:'Process Reports',
+        label:'Create Reports',
+        // context:'opsportal',
+        isController:true, 
+        options:{}, 
+        version:'0' 
+    },
+    { 
+        key:'process.reports.view', 
+        permissions:'reports.runner.view', 
+        icon:'fa-print', 
+        controller:'RunReports',
+        label:'Run Reports',
         // context:'opsportal',
         isController:true, 
         options:{}, 
