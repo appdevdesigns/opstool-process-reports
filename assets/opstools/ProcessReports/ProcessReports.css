@@ -26,6 +26,7 @@ li.rpreport-locked {
 
 .rp-report-title input {
 	width: 400px;
+	color: #000;
 }
 
 .rp-reporttemplate-preview {
@@ -50,5 +51,18 @@ li.rpreport-locked {
 }
 
 .rp-instructionsPanel p {
-    color: #000 !important; 
+	color: #000 !important; 
+}
+
+/* jsreports */
+.jsr-style-root .dropdown-menu>li>a {
+	color: #333 !important;
+}
+
+.jsreports-designer .header h3 {
+	color: #aaa !important;
+}
+
+.navbar .nav>li>a {
+	color: #777 !important;
 }
