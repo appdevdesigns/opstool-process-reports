@@ -46,8 +46,6 @@ module.exports = {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
 									data.staffs = r.data;
-
-									data.staffs = data.staffs.concat(data.staffs);
 								}
 
 								callback();
