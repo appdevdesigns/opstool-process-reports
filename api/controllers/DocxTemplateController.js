@@ -118,11 +118,11 @@ module.exports = {
 
 				data.staffs.forEach(function (s) {
 					// Convert date time to Thai format
-					var visaStartDate = moment(s.person_visa_start_date, 'DD MMMM YYYY', 'en');
-					if (visaStartDate.isValid())
-						s.person_visa_start_date = changeThaiFormat(visaStartDate);
+					// var visaStartDate = moment(s.person_visa_start_date);
+					// if (visaStartDate.isValid())
+					// 	s.person_visa_start_date = changeThaiFormat(visaStartDate);
 
-					var visaExpireDate = moment(s.person_visa_expire_date, 'DD MMMM YYYY', 'en');
+					var visaExpireDate = moment(s.person_visa_expire_date);
 					if (visaExpireDate.isValid())
 						s.person_visa_expire_date = changeThaiFormat(visaExpireDate);
 
@@ -147,7 +147,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-
 				// TODO : Get file binary from database
 				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function (err, content) {
 					var docx = new DocxGen()
