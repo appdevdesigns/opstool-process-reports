@@ -6,6 +6,7 @@
 *
 */
 var AD = require('ad-utils');
+var _ = require('lodash');
 
 module.exports = {
 
