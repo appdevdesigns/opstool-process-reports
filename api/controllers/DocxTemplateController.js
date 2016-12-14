@@ -104,7 +104,7 @@ module.exports = {
 					_.remove(activities, function (a) {
 						var actEndDateObj = moment(a.endDate);
 
-						if (!a.endDate || (actEndDateObj.isValid() && actEndDateObj > endDateObj))
+						if (a.endDate && actEndDateObj.isValid() && actEndDateObj > endDateObj)
 							return true;
 						else
 							return false;
