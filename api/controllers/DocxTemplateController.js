@@ -128,6 +128,25 @@ module.exports = {
 						return s.person_id == a.person_id;
 					});
 
+					// // Person home address
+					// if (s.person_home_address) {
+					// 	var home_address = s.person_home_address;
+
+					// 	s.person_home_address = '';
+					// 	s.person_home_address += '<w:p>';
+
+					// 	s.person_home_address += '<w:pPr>';
+					// 	s.person_home_address += '<w:spacing w:before="1" w:after="5" />';
+					// 	s.person_home_address += '<w:ind w:left="500" w:right="100" />';
+					// 	s.person_home_address += '</w:pPr>';
+
+					// 	s.person_home_address += '<w:r><w:t>';
+					// 	s.person_home_address += 'สถานที่พัก: ';
+					// 	s.person_home_address += '#address#'.replace('#address#', home_address);
+					// 	s.person_home_address += '</w:t></w:r>';
+					// 	s.person_home_address += '</w:p>';
+					// }
+
 					// Set activities order index
 					if (s.activities) {
 						s.activities.forEach(function (a, index) {
@@ -331,13 +350,18 @@ module.exports = {
 							else
 								image.activity_image_caption_right_column = '';
 
+
 							if (img.activity_image_caption_govt_left_column)
 								image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
+							else if (img.activity_image_caption_left_column)
+								image.activity_image_caption_govt_left_column = img.activity_image_caption_left_column;
 							else
 								image.activity_image_caption_govt_left_column = '';
 
 							if (img.activity_image_caption_govt_right_column)
 								image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
+							else if (img.activity_image_caption_right_column)
+								image.activity_image_caption_govt_right_column = img.activity_image_caption_right_column;
 							else
 								image.activity_image_caption_govt_right_column = '';
 
