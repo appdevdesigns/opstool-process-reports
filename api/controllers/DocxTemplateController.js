@@ -88,7 +88,7 @@ module.exports = {
 					_.remove(activities, function (a) {
 						var actStartDateObj = moment(a.startDate);
 
-						if (!a.startDate || actStartDateObj < startDateObj)
+						if (a.endDate && (!a.startDate || actStartDateObj < startDateObj))
 							return true;
 						else
 							return false;
