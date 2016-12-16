@@ -28,6 +28,7 @@ module.exports = {
 
 		var data = { staffs: null };
 		var activities;
+		var activityImages;
 		var resultBuffer;
 
 		var staffName = req.param('Member name');
@@ -41,7 +42,7 @@ module.exports = {
 				async.parallel([
 					// Get staffs data
 					function (callback) {
-						var temp_res = {
+						renderReportController.staffs(req, {
 							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
@@ -50,13 +51,11 @@ module.exports = {
 
 								callback();
 							}
-						};
-
-						renderReportController.staffs(req, temp_res);
+						});
 					},
-					// Get activity images data
+					// Get activities data
 					function (callback) {
-						var temp_res = {
+						renderReportController.activities(req, {
 							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success')
@@ -64,9 +63,21 @@ module.exports = {
 
 								callback();
 							}
-						};
+						});
+					},
+					// Get actiivity images data
+					function (callback) {
+						renderReportController.acitivity_images(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									activityImages = r.data;
+								}
 
-						renderReportController.activities(req, temp_res);
+								callback();
+							}
+						});
+
 					}
 				], function (err) {
 					next(err);
@@ -116,9 +127,9 @@ module.exports = {
 
 				data.staffs.forEach(function (s) {
 					// Convert date time to Thai format
-					// var visaStartDate = moment(s.person_visa_start_date);
-					// if (visaStartDate.isValid())
-					// 	s.person_visa_start_date = changeThaiFormat(visaStartDate);
+					var visaStartDate = moment(s.person_visa_start_date);
+					if (visaStartDate.isValid())
+						s.person_visa_start_date = changeThaiFormat(visaStartDate);
 
 					var visaExpireDate = moment(s.person_visa_expire_date);
 					if (visaExpireDate.isValid())
@@ -126,6 +137,37 @@ module.exports = {
 
 					s.activities = _.filter(activities, function (a) {
 						return s.person_id == a.person_id;
+					});
+
+					s.activity_image_captions = [];
+					s.activity_image_captions.runningOrder = 1;
+					s.activity_image_captions.addCaption = function (caption) {
+						if (this.filter(function (item) { return item.caption == caption; }).length > 0
+							|| caption.indexOf('undefined') > -1) return;
+
+						this.push({
+							order: this.runningOrder,
+							caption: caption
+						});
+						this.runningOrder++;
+					};
+
+					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
+					activity_images.forEach(function (img) {
+						if (img.activity_image_caption_govt_left_column) { // Government caption
+							s.activity_image_captions.addCaption(img.activity_image_caption_govt_left_column);
+						}
+						else if (img.activity_image_caption_left_column) { // Ministry caption
+							s.activity_image_captions.addCaption(img.activity_image_caption_left_column);
+						}
+
+						if (img.activity_image_caption_govt_right_column) { // Government caption
+							s.activity_image_captions.addCaption(img.activity_image_caption_govt_right_column);
+						}
+						else if (img.activity_image_caption_right_column) { // Ministry caption
+							s.activity_image_captions.addCaption(img.activity_image_caption_right_column);
+						}
+
 					});
 
 					// // Person home address
@@ -222,9 +264,6 @@ module.exports = {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
 									data.staffs = r.data;
-
-									// For TEST: reduce number staffs
-									// data.staffs = data.staffs.slice(0, 15);
 								}
 
 								callback();
