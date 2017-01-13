@@ -125,7 +125,14 @@ module.exports = {
 						data.endDate = changeThaiFormat(endDateObj, 'MMMM YYYY');
 				}
 
-				data.staffs.forEach(function (s) {
+				// var numberRawTemplate = '<w:numbering>#absNumberList##numberList#</w:numbering>';
+				// var absNumberRawTemplate = '<w:abstractNum w:abstractNumId="#numId#"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="1440"/></w:tabs><w:ind w:left="1440" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="1"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%2."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="1800"/></w:tabs><w:ind w:left="1800" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="2"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%3."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="2160"/></w:tabs><w:ind w:left="2160" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="3"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%4."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="2520"/></w:tabs><w:ind w:left="2520" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="4"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%5."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="2880"/></w:tabs><w:ind w:left="2880" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="5"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%6."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="3240"/></w:tabs><w:ind w:left="3240" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="6"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%7."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="3600"/></w:tabs><w:ind w:left="3600" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="7"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%8."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="3960"/></w:tabs><w:ind w:left="3960" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="8"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%9."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="4320"/></w:tabs><w:ind w:left="4320" w:hanging="360"/></w:pPr></w:lvl></w:abstractNum>';
+				// var numberItemRawTemplate = '<w:num w:numId="#numId#"><w:abstractNumId w:val="#numId#"/></w:num>';
+
+				// var absNumberRawXml = '',
+				// 	numberItemRawXml = '';
+
+				data.staffs.forEach(function (s, index) {
 					// Convert date time to Thai format
 					var visaStartDate = moment(s.person_visa_start_date);
 					if (visaStartDate.isValid())
@@ -170,32 +177,32 @@ module.exports = {
 
 					});
 
-					// // Person home address
-					// if (s.person_home_address) {
-					// 	var home_address = s.person_home_address;
+					// var actItemTemplate = '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:widowControl/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="#numListId#"/></w:numPr><w:suppressAutoHyphens w:val="true"/><w:bidi w:val="0"/><w:spacing w:lineRule="auto" w:line="240" w:before="0" w:after="0"/><w:ind w:left="1080" w:right="0" w:hanging="360"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Angsana New" w:hAnsi="Angsana New" w:cs="Angsana New"/><w:sz w:val="32"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Angsana New" w:hAnsi="Angsana New" w:cs="Angsana New"/><w:sz w:val="32"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>#caption#</w:t></w:r></w:p>';
 
-					// 	s.person_home_address = '';
-					// 	s.person_home_address += '<w:p>';
+					// s.activitiesRawXml = '';
 
-					// 	s.person_home_address += '<w:pPr>';
-					// 	s.person_home_address += '<w:spacing w:before="1" w:after="5" />';
-					// 	s.person_home_address += '<w:ind w:left="500" w:right="100" />';
-					// 	s.person_home_address += '</w:pPr>';
+					// s.activity_image_captions.forEach(function (imgCaption) {
+					// 	s.activitiesRawXml += actItemTemplate.replace(/#numListId#/g, index + 3).replace('#caption#', imgCaption.caption);
+					// });
 
-					// 	s.person_home_address += '<w:r><w:t>';
-					// 	s.person_home_address += 'สถานที่พัก: ';
-					// 	s.person_home_address += '#address#'.replace('#address#', home_address);
-					// 	s.person_home_address += '</w:t></w:r>';
-					// 	s.person_home_address += '</w:p>';
+					// if (s.activity_image_captions && s.activity_image_captions.length > 0) {
+					// 	absNumberRawXml += absNumberRawTemplate.replace(/#numId#/g, index + 3);
+					// 	numberItemRawXml += numberItemRawTemplate.replace(/#numId#/g, index + 3);
 					// }
 
-					// Set activities order index
-					if (s.activities) {
-						s.activities.forEach(function (a, index) {
-							a.order = index + 1;
+					s.activitiesRawXml = '';
+					if (s.activity_image_captions && s.activity_image_captions.length > 0) {
+						s.activity_image_captions.forEach(function (imgCaption) {
+							s.activitiesRawXml += ('<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:widowControl/><w:tabs><w:tab w:val="left" w:pos="540" w:leader="none"/></w:tabs><w:suppressAutoHyphens w:val="true"/><w:bidi w:val="0"/><w:spacing w:lineRule="auto" w:line="240" w:before="0" w:after="0"/><w:ind w:left="720" w:right="0" w:hanging="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:cs="Angsana New" w:ascii="Angsana New" w:hAnsi="Angsana New"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:cs="Angsana New" w:ascii="Angsana New" w:hAnsi="Angsana New"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t xml:space="preserve">#order#. #caption#</w:t></w:r></w:p>'
+								.replace('#order#', imgCaption.order)
+								.replace('#caption#', imgCaption.caption));
 						});
 					}
+
 				});
+
+				// // Define number list style to template
+				// data.numberRawXml = numberRawTemplate.replace('#absNumberList#', absNumberRawXml).replace('#numberList#', numberItemRawXml);
 
 				_.remove(data.staffs, function (s) {
 					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
