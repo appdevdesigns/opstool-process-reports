@@ -113,9 +113,9 @@ module.exports = {
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
 					_.remove(activities, function (a) {
-						var actEndDateObj = moment(a.endDate);
+						var actStartDateObj = moment(a.startDate);
 
-						if (a.endDate && actEndDateObj.isValid() && actEndDateObj > endDateObj)
+						if (a.endDate && actStartDateObj.isValid() && actStartDateObj > endDateObj)
 							return true;
 						else
 							return false;
@@ -284,8 +284,9 @@ module.exports = {
 						var temp_res = {
 							send: function (result, code) {
 								var r = JSON.parse(result);
-								if (r.status === 'success')
+								if (r.status === 'success') {
 									activity_images = r.data;
+								}
 
 								callback();
 							}
@@ -313,10 +314,12 @@ module.exports = {
 					_.remove(activity_images, function (a) {
 						var actStartDateObj = moment(a.activity_start_date);
 
-						if (!a.activity_start_date || actStartDateObj < startDateObj)
+						if (a.activity_end_date && (!a.activity_start_date || actStartDateObj < startDateObj)) {
 							return true;
-						else
+						}
+						else {
 							return false;
+						}
 					});
 
 					if (startDateObj.isValid())
@@ -327,12 +330,14 @@ module.exports = {
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
 					_.remove(activity_images, function (a) {
-						var actEndDateObj = moment(a.acitivity_end_date);
+						var actStartDateObj = moment(a.activity_start_date);
 
-						if (!a.acitivity_end_date || (actEndDateObj.isValid() && actEndDateObj > endDateObj))
+						if (a.activity_end_date && actStartDateObj.isValid() && actStartDateObj > endDateObj) {
 							return true;
-						else
+						}
+						else {
 							return false;
+						}
 					});
 
 					if (endDateObj.isValid())
@@ -361,6 +366,11 @@ module.exports = {
 					var activities = _.filter(activity_images, function (img) {
 						return img.person_id == s.person_id;
 					});
+
+					if (s.person_id == 80) {
+						console.log('staff: ', s);
+						console.log('activities: ', activities);
+					}
 
 					// Group activities
 					var groupedActivities = _.groupBy(activities, 'activity_id');
@@ -452,7 +462,7 @@ module.exports = {
 							}
 						}
 						catch (err) {
-							console.log('err: ', err);
+							// console.log('err: ', err);
 						}
 					},
 					getSize: function (imgBuffer, tagValue, tagName) {
