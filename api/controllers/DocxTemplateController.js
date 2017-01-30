@@ -97,9 +97,7 @@ module.exports = {
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
 					_.remove(activities, function (a) {
-						var actStartDateObj = moment(a.startDate);
-
-						if (a.endDate && (!a.startDate || actStartDateObj < startDateObj))
+						if (a.endDate && moment(a.endDate) < startDateObj)
 							return true;
 						else
 							return false;
@@ -113,9 +111,7 @@ module.exports = {
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
 					_.remove(activities, function (a) {
-						var actStartDateObj = moment(a.startDate);
-
-						if (a.endDate && actStartDateObj.isValid() && actStartDateObj > endDateObj)
+						if (a.startDate && endDateObj < moment(a.startDate))
 							return true;
 						else
 							return false;
@@ -312,9 +308,7 @@ module.exports = {
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
 					_.remove(activity_images, function (a) {
-						var actStartDateObj = moment(a.activity_start_date);
-
-						if (a.activity_end_date && (!a.activity_start_date || actStartDateObj < startDateObj)) {
+						if (a.endDate && moment(a.endDate) < startDateObj) {
 							return true;
 						}
 						else {
@@ -330,9 +324,7 @@ module.exports = {
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
 					_.remove(activity_images, function (a) {
-						var actStartDateObj = moment(a.activity_start_date);
-
-						if (a.activity_end_date && actStartDateObj.isValid() && actStartDateObj > endDateObj) {
+						if (a.startDate && endDateObj < moment(a.startDate)) {
 							return true;
 						}
 						else {
