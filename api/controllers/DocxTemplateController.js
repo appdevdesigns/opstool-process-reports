@@ -145,6 +145,9 @@ module.exports = {
 					s.activity_image_captions = [];
 					s.activity_image_captions.runningOrder = 1;
 					s.activity_image_captions.addCaption = function (caption) {
+						// Ampersand (&) is reserve work of word format.
+						caption = caption.replace(/&/g, 'and');
+
 						if (this.filter(function (item) { return item.caption == caption; }).length > 0
 							|| caption.indexOf('undefined') > -1) return;
 
