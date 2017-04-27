@@ -66,3 +66,7 @@ li.rpreport-locked {
 .navbar .nav>li>a {
 	color: #777 !important;
 }
+
+.jsr-image {
+	overflow: hidden !important;
+}
