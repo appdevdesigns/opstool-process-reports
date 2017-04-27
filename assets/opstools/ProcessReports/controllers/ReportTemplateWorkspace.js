@@ -1,18 +1,18 @@
 steal(
 	"opstools/ProcessReports/models/RPDataSource.js",
-	function() {
-		System.import('appdev').then(function() {
+	function () {
+		System.import('appdev').then(function () {
 			steal.import(
 				'appdev/ad',
 				'appdev/control/control',
 				'OpsPortal/classes/OpsButtonBusy',
 				'OpsPortal/classes/OpsWidget'
-			).then(function() {
+			).then(function () {
 				// Namespacing conventions:
 				// AD.Control.extend('[application].[controller]', [{ static },] {instance} );
 				AD.Control.extend('opstools.ProcessReports.ReportTemplateWorkspace', {
 
-					init: function(element, options) {
+					init: function (element, options) {
 						var self = this;
 						options = AD.defaults({
 							eventItemSaved: 'RP_ReportTemplate.Saved',
@@ -36,7 +36,7 @@ steal(
 						this.loadReportDataSource();
 						this.initDOM();
 
-						this.element.find('.rp-reporttemplate-submit').each(function(index, btn) {
+						this.element.find('.rp-reporttemplate-submit').each(function (index, btn) {
 							var status = $(btn).attr('rp-status');
 							self.buttons[status] = new AD.op.ButtonBusy(btn);
 						});
@@ -44,7 +44,7 @@ steal(
 
 
 
-					initDOM: function() {
+					initDOM: function () {
 						this.dom = {};
 
 						var template = this.domToTemplate(this.element.find('.rp-report-title'));
@@ -58,17 +58,17 @@ steal(
 
 
 
-					loadReportDataSource: function() {
+					loadReportDataSource: function () {
 						var _this = this;
 
 						this.RPDataSource.findAll()
-							.fail(function(err) {
+							.fail(function (err) {
 								console.error('!!! Dang.  something went wrong:', err);
 							})
-							.then(function(dataSources) {
+							.then(function (dataSources) {
 								_this.data.dataSources = dataSources.attr(); // Convert to array
 
-								_this.data.dataSources.forEach(function(ds) {
+								_this.data.dataSources.forEach(function (ds) {
 									ds.id = ds.id.toString(); // jsReports support only id string
 								});
 							});
@@ -76,7 +76,7 @@ steal(
 
 
 
-					setReportTemplate: function(reportTemplate) {
+					setReportTemplate: function (reportTemplate) {
 						this.data.reportTemplate = reportTemplate;
 
 						var _this = this;
@@ -99,7 +99,7 @@ steal(
 						});
 
 						// $('.jsr-designer-toolbar').remove(); // Fix overlap report UI layout
-						$(this.dom.designer).on("save", function(evt, def) {
+						$(this.dom.designer).on("save", function (evt, def) {
 							_this.element.find('.rp-reporttemplate-save').click();
 						});
 
@@ -116,7 +116,7 @@ steal(
 					},
 
 
-					prepareWorkspaceToCreate: function() {
+					prepareWorkspaceToCreate: function () {
 						this.clearWorkspace();
 
 						this.setReportTemplate(this.RPReportDefinition.extend({
@@ -126,7 +126,7 @@ steal(
 					},
 
 
-					clearWorkspace: function() {
+					clearWorkspace: function () {
 						this.dom.designer = null;
 						this.element.find('.rp-report-designer').html('');
 						this.element.find('.rp-template-form').hide();
@@ -135,14 +135,14 @@ steal(
 						this.element.trigger(this.options.eventClearItemSelected);
 					},
 
-					findDataSchema: function(id) {
+					findDataSchema: function (id) {
 						var data_schema = null;
 
-						var dataSource = $.grep(this.data.dataSources, function(ds) { return ds.id === id; })[0];
+						var dataSource = $.grep(this.data.dataSources, function (ds) { return ds.id === id; })[0];
 
 						if (dataSource.join) {
-							var leftDs = $.grep(this.data.dataSources, function(ds) { return ds.id == dataSource.join.left; })[0];
-							var rightDs = $.grep(this.data.dataSources, function(ds) { return ds.id == dataSource.join.right; })[0];
+							var leftDs = $.grep(this.data.dataSources, function (ds) { return ds.id == dataSource.join.left; })[0];
+							var rightDs = $.grep(this.data.dataSources, function (ds) { return ds.id == dataSource.join.right; })[0];
 
 							data_schema = {
 								fields: leftDs.schema.fields.concat(rightDs.schema.fields)
@@ -154,9 +154,9 @@ steal(
 						return data_schema;
 					},
 
-					mockDataPreview: function(data_schema) {
+					mockDataPreview: function (data_schema) {
 						var data = {};
-						data_schema.fields.forEach(function(f) {
+						data_schema.fields.forEach(function (f) {
 							switch (f.type) {
 								case 'number':
 									data[f.name] = 9999;
@@ -171,20 +171,20 @@ steal(
 						return data;
 					},
 
-					resize: function(height) {
+					resize: function (height) {
 						this.data.screenHeight = height;
 
 						if (this.dom.FormWidget) {
 							this.dom.FormWidget.resize({ height: height - 105 });
 						}
 					},
-					buttonsEnable: function() {
+					buttonsEnable: function () {
 						for (var b in this.buttons) {
 							if (this.buttons[b])
 								this.buttons[b].enable();
 						}
 					},
-					buttonsDisable: function() {
+					buttonsDisable: function () {
 						for (var b in this.buttons) {
 							if (this.buttons[b])
 								this.buttons[b].disable();
@@ -192,7 +192,7 @@ steal(
 					},
 
 
-					'.rp-reporttemplate-submit click': function($btn) {
+					'.rp-reporttemplate-submit click': function ($btn) {
 						var _this = this;
 
 						var status = $btn.attr('rp-status');
@@ -202,11 +202,11 @@ steal(
 						switch (status) {
 							case 'cancel':
 								AD.op.Dialog.Confirm({
-									fnYes: function() {
+									fnYes: function () {
 										_this.buttonsEnable();
 										_this.clearWorkspace();
 									},
-									fnNo: function() {
+									fnNo: function () {
 										_this.buttonsEnable();
 									}
 								});
@@ -225,7 +225,7 @@ steal(
 									// TODO : save images field
 									this.data.reportTemplate.attr('report_def', report_def);
 
-									this.data.reportTemplate.save().then(function() {
+									this.data.reportTemplate.save().then(function () {
 										_this.element.trigger(_this.options.eventItemSaved, _this.data.reportTemplate);
 
 										_this.buttons[status].ready();
@@ -239,9 +239,9 @@ steal(
 								break;
 							case 'delete':
 								AD.op.Dialog.Confirm({
-									fnYes: function() {
+									fnYes: function () {
 										_this.buttons[status].busy();
-										_this.data.reportTemplate.destroy(function() {
+										_this.data.reportTemplate.destroy(function () {
 											_this.buttons[status].ready();
 											_this.buttonsEnable();
 
@@ -249,7 +249,7 @@ steal(
 											_this.element.find('.rp-instructionsPanel').show();
 										});
 									},
-									fnNo: function() {
+									fnNo: function () {
 										_this.buttonsEnable();
 									}
 								});
@@ -258,12 +258,12 @@ steal(
 					},
 
 					// Create button in the instruction page
-					'.rp-reporttemplate-create click': function() {
+					'.rp-reporttemplate-create click': function () {
 						this.prepareWorkspaceToCreate();
 					},
 
 					// Preview button in the edit page 
-					'.rp-reporttemplate-preview click': function() {
+					'.rp-reporttemplate-preview click': function () {
 						var _this = this,
 							report_def = this.dom.designer.getReport(),
 							data_source_ids = [],
@@ -285,7 +285,7 @@ steal(
 
 						// Find subreport data source info
 						if (report_def.body.elements && report_def.body.elements.length > 0) {
-							report_def.body.elements.forEach(function(elm) {
+							report_def.body.elements.forEach(function (elm) {
 								if (elm.type === 'subreport') {
 									data_source_ids.push({ id: elm.report.body.data_source });
 								}
@@ -294,22 +294,22 @@ steal(
 
 						async.series(
 							[
-								function(next) {
+								function (next) {
 									// Get data sources info
-									_this.RPDataSource.findAll({ or: data_source_ids }).then(function(ds) {
+									_this.RPDataSource.findAll({ or: data_source_ids }).then(function (ds) {
 										data_sources = ds;
 
 										next();
 									});
 								},
-								function(next) {
+								function (next) {
 									var getJoinDsTasks = [];
 
 									// Find Join data source object
-									data_sources.forEach(function(ds) {
+									data_sources.forEach(function (ds) {
 										if (ds.join) {
-											getJoinDsTasks.push(function(callback) {
-												_this.RPDataSource.findAll({ or: [{ id: ds.join.left }, { id: ds.join.right }] }).then(function(ds) {
+											getJoinDsTasks.push(function (callback) {
+												_this.RPDataSource.findAll({ or: [{ id: ds.join.left }, { id: ds.join.right }] }).then(function (ds) {
 													data_sources = data_sources.concat(ds);
 
 													callback();
@@ -318,12 +318,12 @@ steal(
 										}
 									});
 
-									async.parallel(getJoinDsTasks, function() {
+									async.parallel(getJoinDsTasks, function () {
 										// Unique data sources
 										var data_source_ids = {};
 										var unique_ids = [];
 
-										$.each(data_sources, function(i, ds) {
+										$.each(data_sources, function (i, ds) {
 											if (!data_source_ids[ds.id]) {
 												data_source_ids[ds.id] = true;
 												unique_ids.push(ds);
@@ -334,11 +334,11 @@ steal(
 										next();
 									});
 								},
-								function(next) {
+								function (next) {
 									var getDataSourcesTasks = [];
 
 									// Get data to render report
-									data_sources.forEach(function(ds) {
+									data_sources.forEach(function (ds) {
 										if (ds.join) {
 											datasets.push({
 												"id": ds.id.toString(),
@@ -347,8 +347,8 @@ steal(
 											});
 										}
 										else {
-											getDataSourcesTasks.push(function(callback) {
-												AD.comm.service.get({ url: ds.getDataUrl }, function(err, data) {
+											getDataSourcesTasks.push(function (callback) {
+												AD.comm.service.get({ url: ds.getDataUrl }, function (err, data) {
 
 													datasets.push({
 														"id": ds.id.toString(),
@@ -363,11 +363,11 @@ steal(
 										}
 									});
 
-									async.parallel(getDataSourcesTasks, function() {
+									async.parallel(getDataSourcesTasks, function () {
 										next();
 									});
 								}
-							], function() {
+							], function () {
 								$('.rp-report-preview').show();
 
 								// Render report preview
@@ -391,7 +391,7 @@ steal(
 									$('.jsr-save-dropdown-button ul').append('<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="jsr-export-docx rp-run-report-export-docx">Docx</a></li>');
 								}
 
-								$('.rp-report-preview-export-html').bind('click', function() {
+								$('.rp-report-preview-export-html').bind('click', function () {
 									// Get report html format
 									var html = _this.getReportHtml();
 
@@ -402,12 +402,20 @@ steal(
 									downloadReportHtml[0].click();
 								});
 
-								$('.rp-run-report-export-docx').bind('click', function(e) {
+								$('.rp-run-report-export-docx').bind('click', function (e) {
 									e.preventDefault();
 
 									var filter = '';
-									_this.element.find(".jsreports-input").each(function(index) {
+									_this.element.find(".jsreports-input").each(function (index) {
 										var value = $(this).find('input').val();
+
+										if (!value && $(this).find('.select2-chosen').length > 0) {
+											value = $(this).find('.select2-chosen').html();
+
+											if (value == 'Select an option')
+												value = '';
+										}
+
 										if (value) {
 											var name = $(this).text().split(':')[0];
 											filter += name + '=' + value + '&';
@@ -421,11 +429,11 @@ steal(
 							});
 					},
 
-					getReportHtml: function() {
+					getReportHtml: function () {
 						var selector = '.rp-report-preview .jsr-content-viewport';
 						var html = '<div class="jsr-report">' + $(selector).html() + '</div>';
 
-						selector = selector.split(",").map(function(subselector) {
+						selector = selector.split(",").map(function (subselector) {
 							return subselector + "," + subselector + " *";
 						}).join(",");
 
@@ -446,7 +454,7 @@ steal(
 							}
 						}
 
-						var style = rulesUsed.map(function(cssRule) {
+						var style = rulesUsed.map(function (cssRule) {
 							var cssText = '';
 							if (cssRule.style) {
 								cssText = cssRule.style.cssText.toLowerCase();

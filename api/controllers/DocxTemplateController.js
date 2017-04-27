@@ -34,6 +34,7 @@ module.exports = {
 		var staffName = req.param('Member name');
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
+		var projectName = req.param('Project');
 
 		async.series([
 
@@ -67,7 +68,7 @@ module.exports = {
 					},
 					// Get actiivity images data
 					function (callback) {
-						renderReportController.acitivity_images(req, {
+						renderReportController.activity_images(req, {
 							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
@@ -121,6 +122,13 @@ module.exports = {
 						data.endDate = changeThaiFormat(endDateObj, 'MMMM YYYY');
 				}
 
+				// Project name filter
+				if (projectName) {
+					_.remove(activities, function (a) {
+						return a.project_name != projectName;
+					});
+				}
+
 				// var numberRawTemplate = '<w:numbering>#absNumberList##numberList#</w:numbering>';
 				// var absNumberRawTemplate = '<w:abstractNum w:abstractNumId="#numId#"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="1440"/></w:tabs><w:ind w:left="1440" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="1"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%2."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="1800"/></w:tabs><w:ind w:left="1800" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="2"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%3."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="2160"/></w:tabs><w:ind w:left="2160" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="3"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%4."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="2520"/></w:tabs><w:ind w:left="2520" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="4"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%5."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="2880"/></w:tabs><w:ind w:left="2880" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="5"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%6."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="3240"/></w:tabs><w:ind w:left="3240" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="6"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%7."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="3600"/></w:tabs><w:ind w:left="3600" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="7"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%8."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="3960"/></w:tabs><w:ind w:left="3960" w:hanging="360"/></w:pPr></w:lvl><w:lvl w:ilvl="8"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%9."/><w:lvlJc w:val="left"/><w:pPr><w:tabs><w:tab w:val="num" w:pos="4320"/></w:tabs><w:ind w:left="4320" w:hanging="360"/></w:pPr></w:lvl></w:abstractNum>';
 				// var numberItemRawTemplate = '<w:num w:numId="#numId#"><w:abstractNumId w:val="#numId#"/></w:num>';
@@ -158,7 +166,14 @@ module.exports = {
 						this.runningOrder++;
 					};
 
-					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
+					var activity_images = _.filter(activityImages, function (img) {
+						var isInProject = true;
+						if (projectName) {
+							isInProject = (img.project_name == projectName);
+						}
+
+						return s.person_id == img.person_id && isInProject; 
+					});
 					activity_images.forEach(function (img) {
 						if (img.activity_image_caption_govt_left_column) { // Government caption
 							s.activity_image_captions.addCaption(img.activity_image_caption_govt_left_column);
@@ -246,9 +261,9 @@ module.exports = {
 		});
 	},
 
-	// /opstool-process-reports/docxtemplate/acitivity_images
-	acitivity_images: function (req, res) {
-		AD.log('<green>::: docxtemplate.acitivity_images() :::</green>');
+	// /opstool-process-reports/docxtemplate/activity_images
+	activity_images: function (req, res) {
+		AD.log('<green>::: docxtemplate.activity_images() :::</green>');
 
 		var data = { staffs: null };
 		var activity_images;
@@ -257,6 +272,7 @@ module.exports = {
 		var staffName = req.param('Member name');
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
+		var projectName = req.param('Project');
 
 		async.series([
 
@@ -291,7 +307,7 @@ module.exports = {
 							}
 						};
 
-						renderReportController.acitivity_images(req, temp_res);
+						renderReportController.activity_images(req, temp_res);
 					}
 				], function (err) {
 					next(err);
@@ -339,6 +355,13 @@ module.exports = {
 						data.endDate = changeThaiFormat(endDateObj)
 				}
 
+				// Project name filter
+				if (projectName) {
+					_.remove(activity_images, function (a) {
+						return a.project_name != projectName;
+					});
+				}
+
 				// Delete null value properties
 				activity_images.forEach(function (img, index) {
 					if (typeof img.activity_image_file_name_right_column === 'undefined' || img.activity_image_file_name_right_column === null || img.activity_image_file_name_right_column === 'blank.jpg')
@@ -359,13 +382,12 @@ module.exports = {
 
 				data.staffs.forEach(function (s, index) {
 					var activities = _.filter(activity_images, function (img) {
-						return img.person_id == s.person_id;
+						var isInProject = true;
+						if (projectName) {
+							isInProject = (img.project_name == projectName);
+						}
+						return img.person_id == s.person_id && isInProject;
 					});
-
-					if (s.person_id == 80) {
-						console.log('staff: ', s);
-						console.log('activities: ', activities);
-					}
 
 					// Group activities
 					var groupedActivities = _.groupBy(activities, 'activity_id');
@@ -496,7 +518,7 @@ module.exports = {
 				ADCore.comm.error(res, err, 500);
 			} else {
 
-				AD.log('<green>::: end docxtemplate.acitivity_images() :::</green>');
+				AD.log('<green>::: end docxtemplate.activity_images() :::</green>');
 
 				var buff = new Buffer(resultBuffer, 'binary');
 

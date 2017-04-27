@@ -205,6 +205,14 @@ steal(
 									var filter = '';
 									$(".jsreports-input").each(function (index) {
 										var value = $(this).find('input').val();
+
+										if (!value && $(this).find('.select2-chosen').length > 0) {
+											value = $(this).find('.select2-chosen').html();
+
+											if (value == 'Select an option')
+												value = '';
+										}
+
 										if (value) {
 											var name = $(this).text().split(':')[0];
 											filter += name + '=' + value + '&';
