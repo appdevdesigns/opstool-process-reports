@@ -156,8 +156,9 @@ module.exports = {
 						// Ampersand (&) is reserve work of word format.
 						caption = caption.replace(/&/g, 'and');
 
-						if (this.filter(function (item) { return item.caption == caption; }).length > 0
-							|| caption.indexOf('undefined') > -1) return;
+						// // Prevent duplicate caption & Remove undefined 
+						// if (this.filter(function (item) { return item.caption == caption; }).length > 0
+						// 	|| caption.indexOf('undefined') > -1) return;
 
 						this.push({
 							order: this.runningOrder,
@@ -219,7 +220,7 @@ module.exports = {
 				// data.numberRawXml = numberRawTemplate.replace('#absNumberList#', absNumberRawXml).replace('#numberList#', numberItemRawXml);
 
 				_.remove(data.staffs, function (s) {
-					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
+					return s.activities == null || !s.activities || s.activities.length < 1;
 				});
 
 				next();
@@ -364,19 +365,19 @@ module.exports = {
 
 				// Delete null value properties
 				activity_images.forEach(function (img, index) {
-					if (typeof img.activity_image_file_name_right_column === 'undefined' || img.activity_image_file_name_right_column === null || img.activity_image_file_name_right_column === 'blank.jpg')
+					if (img.activity_image_file_name_right_column == null || img.activity_image_file_name_right_column === 'blank.jpg')
 						delete img['activity_image_file_name_right_column'];
 
-					if (typeof img.activity_image_caption_left_column === 'undefined' || img.activity_image_caption_left_column === null)
+					if (img.activity_image_caption_left_column == null)
 						img.activity_image_caption_left_column = '';
 
-					if (typeof img.activity_image_caption_right_column === 'undefined' || img.activity_image_caption_right_column === null)
+					if (img.activity_image_caption_right_column == null)
 						img.activity_image_caption_right_column = '';
 
-					if (typeof img.activity_image_caption_govt_left_column === 'undefined' || img.activity_image_caption_govt_left_column === null)
+					if (img.activity_image_caption_govt_left_column == null)
 						img.activity_image_caption_govt_left_column = '';
 
-					if (typeof img.activity_image_caption_govt_right_column === 'undefined' || img.activity_image_caption_govt_right_column === null)
+					if (img.activity_image_caption_govt_right_column == null)
 						img.activity_image_caption_govt_right_column = '';
 				});
 
@@ -455,7 +456,7 @@ module.exports = {
 
 				// Remove staffs who don't have any activities
 				_.remove(data.staffs, function (s) {
-					return typeof s.activities === 'undefined' || !s.activities || s.activities.length < 1;
+					return s.activities == null || !s.activities || s.activities.length < 1;
 				});
 
 				data.activity_image_file_name_left_column = ""; // Ignore bug in docxtemplater-image-module v.1.0.0 unstable
