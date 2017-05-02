@@ -141,6 +141,15 @@ steal(
 														if (d.activity_image_file_name_right_column) {
 															d.activity_image_file_name_right_column = '/data/fcf/images/activities/' + d.activity_image_file_name_right_column;
 														}
+
+														// WORKAROUND: Support date filter of JSReport when data is null
+														if (d.activity_start_date == undefined || d.activity_start_date == null) {
+															d.activity_start_date = (new Date(-8640000000000000)).toISOString();
+														}
+
+														if (d.activity_end_date == undefined || d.activity_end_date == null) {
+															d.activity_end_date = (new Date(8640000000000000)).toISOString();
+														}
 													});
 
 													datasets.push({
