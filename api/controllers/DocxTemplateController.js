@@ -330,7 +330,7 @@ module.exports = {
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
 					_.remove(activity_images, function (a) {
-						if (a.endDate && moment(a.endDate) < startDateObj) {
+						if (a.activity_end_date && moment(a.activity_end_date) < startDateObj) {
 							return true;
 						}
 						else {
@@ -346,7 +346,7 @@ module.exports = {
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
 					_.remove(activity_images, function (a) {
-						if (a.startDate && endDateObj < moment(a.startDate)) {
+						if (a.activity_start_date && endDateObj < moment(a.activity_start_date)) {
 							return true;
 						}
 						else {
