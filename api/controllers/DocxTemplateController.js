@@ -100,12 +100,12 @@ module.exports = {
 				if (startDate) {
 					startDateObj = moment(startDate, 'M/D/YY', 'en');
 
-					// _.remove(activities, function (a) {
-					// 	if (a.endDate && moment(a.endDate) < startDateObj)
-					// 		return true;
-					// 	else
-					// 		return false;
-					// });
+					_.remove(activityImages, function (img) {
+						if (img.image_date && moment(img.image_date) < startDateObj)
+							return true;
+						else
+							return false;
+					});
 
 					if (startDateObj.isValid())
 						data.startDate = changeThaiFormat(startDateObj, 'MMMM YYYY');
@@ -115,12 +115,12 @@ module.exports = {
 				if (endDate) {
 					endDateObj = moment(endDate, 'M/D/YY', 'en');
 
-					// _.remove(activities, function (a) {
-					// 	if (a.startDate && endDateObj < moment(a.startDate))
-					// 		return true;
-					// 	else
-					// 		return false;
-					// });
+					_.remove(activityImages, function (img) {
+						if (img.image_date && endDateObj < moment(img.image_date))
+							return true;
+						else
+							return false;
+					});
 
 					if (endDateObj.isValid())
 						data.endDate = changeThaiFormat(endDateObj, 'MMMM YYYY');
@@ -182,27 +182,11 @@ module.exports = {
 					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
 					activity_images.forEach(function (img) {
 
-						// Filter left column image date
-						if ((startDateObj < moment(img.activity_image_date_left_column) || startDateObj == null)
-							&& ((moment(img.activity_image_date_left_column) < endDateObj) || endDateObj == null)) {
-
-							if (img.activity_image_caption_govt_left_column) { // Government caption
-								s.activity_image_captions.addCaption(img.activity_image_caption_govt_left_column);
-							}
-							else if (img.activity_image_caption_left_column) { // Ministry caption
-								s.activity_image_captions.addCaption(img.activity_image_caption_left_column);
-							}
+						if (img.image_caption_govt) { // Government caption
+							s.activity_image_captions.addCaption(img.image_caption_govt);
 						}
-
-						// Filter right column image date
-						if ((startDateObj < moment(img.activity_image_date_right_column) || startDateObj == null)
-							&& ((moment(img.activity_image_date_right_column) < endDateObj) || endDateObj == null)) {
-							if (img.activity_image_caption_govt_right_column) { // Government caption
-								s.activity_image_captions.addCaption(img.activity_image_caption_govt_right_column);
-							}
-							else if (img.activity_image_caption_right_column) { // Ministry caption
-								s.activity_image_captions.addCaption(img.activity_image_caption_right_column);
-							}
+						else if (img.image_caption) { // Ministry caption
+							s.activity_image_captions.addCaption(img.image_caption);
 						}
 
 					});
@@ -292,6 +276,8 @@ module.exports = {
 
 		var startDateObj, endDateObj;
 
+		var columnImages = [];
+
 		async.series([
 
 			// Get data
@@ -332,6 +318,81 @@ module.exports = {
 				});
 			},
 
+			function (next) {
+				// Activities start date filter
+				if (startDate) {
+					startDateObj = moment(startDate, 'M/D/YY', 'en');
+
+					if (startDateObj.isValid())
+						data.startDate = changeThaiFormat(startDateObj)
+				}
+
+				// Activities end date filter
+				if (endDate) {
+					endDateObj = moment(endDate, 'M/D/YY', 'en');
+
+					if (endDateObj.isValid())
+						data.endDate = changeThaiFormat(endDateObj)
+				}
+
+				_.remove(activity_images, function (img) {
+					if (startDateObj != null && (moment(img.image_date) < startDateObj)) {
+						return true;
+					}
+					else if (endDateObj != null && (moment(img.image_date) > endDateObj)) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				});
+
+			},
+
+			function (next) {
+				var groupedImages = _.groupBy(_.uniq(activity_images), function (img) {
+					return img.activity_id + '&' + img.person_id;
+				});
+
+				for (var actId in groupedImages) {
+					var img = groupedImages[actId];
+					for (var i = 0; i < img.length; i += 2) {
+
+						var result = {
+							'person_id': img[i].person_id,
+							'activity_id': img[i].activity_id,
+							'activity_name': img[i].activity_name,
+							'activity_name_govt': img[i].activity_name_govt,
+							'activity_description': img[i].activity_description,
+							'activity_description_govt': img[i].activity_description_govt,
+							'activity_start_date': img[i].activity_start_date,
+							'activity_end_date': img[i].activity_end_date,
+							'activity_image_file_name_left_column': img[i].activity_image_file_name,
+							'activity_image_caption_left_column': img[i].caption,
+							'activity_image_caption_govt_left_column': img[i].caption_govt,
+							'activity_image_date_left_column': img[i].image_date,
+							'project_id': img[i].project_id,
+							'project_name': img[i].project_name
+						};
+
+						var right_column_img = img[i + 1];
+						if (right_column_img) {
+							result.activity_image_file_name_right_column = right_column_img.activity_image_file_name;
+							result.activity_image_caption_right_column = right_column_img.caption;
+							result.activity_image_caption_govt_right_column = right_column_img.caption_govt;
+							result.activity_image_date_right_column = right_column_img.image_date;
+						}
+						else {
+							result.activity_image_file_name_right_column = 'blank.jpg';
+						}
+
+						columnImages.push(result);
+					}
+				}
+
+				next();
+			},
+
 			// Convert data to support docx template
 			function (next) {
 				// Staffs filter
@@ -341,47 +402,15 @@ module.exports = {
 					});
 				}
 
-				// Activities start date filter
-				if (startDate) {
-					startDateObj = moment(startDate, 'M/D/YY', 'en');
-					// _.remove(activity_images, function (a) {
-					// 	if (a.activity_end_date && moment(a.activity_end_date) < startDateObj) {
-					// 		return true;
-					// 	}
-					// 	else {
-					// 		return false;
-					// 	}
-					// });
-
-					if (startDateObj.isValid())
-						data.startDate = changeThaiFormat(startDateObj)
-				}
-
-				// Activities end date filter
-				if (endDate) {
-					endDateObj = moment(endDate, 'M/D/YY', 'en');
-					// _.remove(activity_images, function (a) {
-					// 	if (a.activity_start_date && endDateObj < moment(a.activity_start_date)) {
-					// 		return true;
-					// 	}
-					// 	else {
-					// 		return false;
-					// 	}
-					// });
-
-					if (endDateObj.isValid())
-						data.endDate = changeThaiFormat(endDateObj)
-				}
-
 				// Project name filter
 				if (projectName) {
-					_.remove(activity_images, function (a) {
+					_.remove(columnImages, function (a) {
 						return a.project_name != projectName;
 					});
 				}
 
 				// Delete null value properties
-				activity_images.forEach(function (img, index) {
+				columnImages.forEach(function (img, index) {
 					if (img.activity_image_file_name_right_column == null || img.activity_image_file_name_right_column === 'blank.jpg')
 						delete img['activity_image_file_name_right_column'];
 
@@ -399,7 +428,7 @@ module.exports = {
 				});
 
 				data.staffs.forEach(function (s, index) {
-					var activities = _.filter(activity_images, function (img) {
+					var activities = _.filter(columnImages, function (img) {
 						var isInProject = true;
 						if (projectName) {
 							isInProject = (img.project_name == projectName);
