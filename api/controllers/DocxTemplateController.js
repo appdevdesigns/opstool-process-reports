@@ -319,20 +319,12 @@ module.exports = {
 			},
 
 			function (next) {
-				// Activities start date filter
 				if (startDate) {
 					startDateObj = moment(startDate, 'M/D/YY', 'en');
-
-					if (startDateObj.isValid())
-						data.startDate = changeThaiFormat(startDateObj)
 				}
 
-				// Activities end date filter
 				if (endDate) {
 					endDateObj = moment(endDate, 'M/D/YY', 'en');
-
-					if (endDateObj.isValid())
-						data.endDate = changeThaiFormat(endDateObj)
 				}
 
 				_.remove(activity_images, function (img) {
@@ -347,6 +339,12 @@ module.exports = {
 					}
 				});
 
+				if (startDateObj && startDateObj.isValid())
+					data.startDate = changeThaiFormat(startDateObj)
+				if (endDateObj && endDateObj.isValid())
+					data.endDate = changeThaiFormat(endDateObj)
+
+				next();
 			},
 
 			function (next) {
@@ -367,9 +365,9 @@ module.exports = {
 							'activity_description_govt': img[i].activity_description_govt,
 							'activity_start_date': img[i].activity_start_date,
 							'activity_end_date': img[i].activity_end_date,
-							'activity_image_file_name_left_column': img[i].activity_image_file_name,
-							'activity_image_caption_left_column': img[i].caption,
-							'activity_image_caption_govt_left_column': img[i].caption_govt,
+							'activity_image_file_name_left_column': img[i].image_file_name,
+							'activity_image_caption_left_column': img[i].image_caption,
+							'activity_image_caption_govt_left_column': img[i].image_caption_govt,
 							'activity_image_date_left_column': img[i].image_date,
 							'project_id': img[i].project_id,
 							'project_name': img[i].project_name
@@ -377,9 +375,9 @@ module.exports = {
 
 						var right_column_img = img[i + 1];
 						if (right_column_img) {
-							result.activity_image_file_name_right_column = right_column_img.activity_image_file_name;
-							result.activity_image_caption_right_column = right_column_img.caption;
-							result.activity_image_caption_govt_right_column = right_column_img.caption_govt;
+							result.activity_image_file_name_right_column = right_column_img.image_file_name;
+							result.activity_image_caption_right_column = right_column_img.image_caption;
+							result.activity_image_caption_govt_right_column = right_column_img.image_caption_govt;
 							result.activity_image_date_right_column = right_column_img.image_date;
 						}
 						else {
@@ -411,20 +409,20 @@ module.exports = {
 
 				// Delete null value properties
 				columnImages.forEach(function (img, index) {
-					if (img.activity_image_file_name_right_column == null || img.activity_image_file_name_right_column === 'blank.jpg')
+					if (img['activity_image_file_name_right_column'] == null || img['activity_image_file_name_right_column'] === 'blank.jpg')
 						delete img['activity_image_file_name_right_column'];
 
-					if (img.activity_image_caption_left_column == null)
-						img.activity_image_caption_left_column = '';
+					if (img['activity_image_caption_left_column'] == null)
+						img['activity_image_caption_left_column'] = '';
 
-					if (img.activity_image_caption_right_column == null)
-						img.activity_image_caption_right_column = '';
+					if (img['activity_image_caption_right_column'] == null)
+						img['activity_image_caption_right_column'] = '';
 
-					if (img.activity_image_caption_govt_left_column == null)
-						img.activity_image_caption_govt_left_column = '';
+					if (img['activity_image_caption_govt_left_column'] == null)
+						img['activity_image_caption_govt_left_column'] = '';
 
-					if (img.activity_image_caption_govt_right_column == null)
-						img.activity_image_caption_govt_right_column = '';
+					if (img['activity_image_caption_govt_right_column'] == null)
+						img['activity_image_caption_govt_right_column'] = '';
 				});
 
 				data.staffs.forEach(function (s, index) {
@@ -454,41 +452,36 @@ module.exports = {
 						r.images = _.map(current, function (img) {
 							var image = {};
 
-							if ((startDateObj < moment(img.activity_image_date_left_column) || startDateObj == null)
-								&& ((moment(img.activity_image_date_left_column) < endDateObj) || endDateObj == null)) {
-								if (img.activity_image_file_name_left_column)
-									image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
+							if (img.activity_image_file_name_left_column)
+								image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
 
-								if (img.activity_image_caption_left_column)
-									image.activity_image_caption_left_column = img.activity_image_caption_left_column;
-								else
-									image.activity_image_caption_left_column = '';
+							if (img.activity_image_caption_left_column)
+								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
+							else
+								image.activity_image_caption_left_column = '';
 
-								if (img.activity_image_caption_govt_left_column)
-									image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
-								else if (img.activity_image_caption_left_column)
-									image.activity_image_caption_govt_left_column = img.activity_image_caption_left_column;
-								else
-									image.activity_image_caption_govt_left_column = '';
-							}
+							if (img.activity_image_caption_govt_left_column)
+								image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
+							else if (img.activity_image_caption_left_column)
+								image.activity_image_caption_govt_left_column = img.activity_image_caption_left_column;
+							else
+								image.activity_image_caption_govt_left_column = '';
 
-							if ((startDateObj < moment(img.activity_image_date_right_column) || startDateObj == null)
-								&& ((moment(img.activity_image_date_right_column) < endDateObj) || endDateObj == null)) {
-								if (img.activity_image_file_name_right_column)
-									image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
-								if (img.activity_image_caption_right_column)
-									image.activity_image_caption_right_column = img.activity_image_caption_right_column;
-								else
-									image.activity_image_caption_right_column = '';
+							if (img.activity_image_file_name_right_column)
+								image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
-								if (img.activity_image_caption_govt_right_column)
-									image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
-								else if (img.activity_image_caption_right_column)
-									image.activity_image_caption_govt_right_column = img.activity_image_caption_right_column;
-								else
-									image.activity_image_caption_govt_right_column = '';
-							}
+							if (img.activity_image_caption_right_column)
+								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
+							else
+								image.activity_image_caption_right_column = '';
+
+							if (img.activity_image_caption_govt_right_column)
+								image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
+							else if (img.activity_image_caption_right_column)
+								image.activity_image_caption_govt_right_column = img.activity_image_caption_right_column;
+							else
+								image.activity_image_caption_govt_right_column = '';
 
 							// Show page header
 							if (!r.activity_has_header && (image_row_number === 1 || (image_row_number - 1) % 2 === 0))
@@ -518,7 +511,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-
 				var imageModule = new DocxImageModule({
 					centered: false,
 					getImage: function (tagValue, tagName) {
@@ -531,7 +523,7 @@ module.exports = {
 							}
 						}
 						catch (err) {
-							// console.log('err: ', err);
+							console.error(err);
 						}
 					},
 					getSize: function (imgBuffer, tagValue, tagName) {
