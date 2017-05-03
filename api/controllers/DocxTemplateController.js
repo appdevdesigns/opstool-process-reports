@@ -36,6 +36,8 @@ module.exports = {
 		var endDate = req.param('End date');
 		var projectName = req.param('Project');
 
+		var startDateObj, endDateObj;
+
 		async.series([
 
 			// Get data
@@ -96,7 +98,7 @@ module.exports = {
 
 				// Activities start date filter
 				if (startDate) {
-					var startDateObj = moment(startDate, 'M/D/YY', 'en');
+					startDateObj = moment(startDate, 'M/D/YY', 'en');
 
 					// _.remove(activities, function (a) {
 					// 	if (a.endDate && moment(a.endDate) < startDateObj)
@@ -104,12 +106,6 @@ module.exports = {
 					// 	else
 					// 		return false;
 					// });
-					_.remove(activityImages, function (a) {
-						if (a.image_date && moment(a.image_date) < startDateObj)
-							return true;
-						else
-							return false;
-					});
 
 					if (startDateObj.isValid())
 						data.startDate = changeThaiFormat(startDateObj, 'MMMM YYYY');
@@ -117,7 +113,7 @@ module.exports = {
 
 				// Activities end date filter
 				if (endDate) {
-					var endDateObj = moment(endDate, 'M/D/YY', 'en');
+					endDateObj = moment(endDate, 'M/D/YY', 'en');
 
 					// _.remove(activities, function (a) {
 					// 	if (a.startDate && endDateObj < moment(a.startDate))
@@ -125,12 +121,6 @@ module.exports = {
 					// 	else
 					// 		return false;
 					// });
-					_.remove(activityImages, function (a) {
-						if (a.image_date && endDateObj < moment(a.image_date))
-							return true;
-						else
-							return false;
-					});
 
 					if (endDateObj.isValid())
 						data.endDate = changeThaiFormat(endDateObj, 'MMMM YYYY');
@@ -191,18 +181,28 @@ module.exports = {
 
 					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
 					activity_images.forEach(function (img) {
-						if (img.activity_image_caption_govt_left_column) { // Government caption
-							s.activity_image_captions.addCaption(img.activity_image_caption_govt_left_column);
-						}
-						else if (img.activity_image_caption_left_column) { // Ministry caption
-							s.activity_image_captions.addCaption(img.activity_image_caption_left_column);
+
+						// Filter left column image date
+						if ((startDateObj < moment(img.activity_image_date_left_column) || startDateObj == null)
+							&& ((moment(img.activity_image_date_left_column) < endDateObj) || endDateObj == null)) {
+
+							if (img.activity_image_caption_govt_left_column) { // Government caption
+								s.activity_image_captions.addCaption(img.activity_image_caption_govt_left_column);
+							}
+							else if (img.activity_image_caption_left_column) { // Ministry caption
+								s.activity_image_captions.addCaption(img.activity_image_caption_left_column);
+							}
 						}
 
-						if (img.activity_image_caption_govt_right_column) { // Government caption
-							s.activity_image_captions.addCaption(img.activity_image_caption_govt_right_column);
-						}
-						else if (img.activity_image_caption_right_column) { // Ministry caption
-							s.activity_image_captions.addCaption(img.activity_image_caption_right_column);
+						// Filter right column image date
+						if ((startDateObj < moment(img.activity_image_date_right_column) || startDateObj == null)
+							&& ((moment(img.activity_image_date_right_column) < endDateObj) || endDateObj == null)) {
+							if (img.activity_image_caption_govt_right_column) { // Government caption
+								s.activity_image_captions.addCaption(img.activity_image_caption_govt_right_column);
+							}
+							else if (img.activity_image_caption_right_column) { // Ministry caption
+								s.activity_image_captions.addCaption(img.activity_image_caption_right_column);
+							}
 						}
 
 					});
@@ -290,6 +290,8 @@ module.exports = {
 		var endDate = req.param('End date');
 		var projectName = req.param('Project');
 
+		var startDateObj, endDateObj;
+
 		async.series([
 
 			// Get data
@@ -341,7 +343,7 @@ module.exports = {
 
 				// Activities start date filter
 				if (startDate) {
-					var startDateObj = moment(startDate, 'M/D/YY', 'en');
+					startDateObj = moment(startDate, 'M/D/YY', 'en');
 					// _.remove(activity_images, function (a) {
 					// 	if (a.activity_end_date && moment(a.activity_end_date) < startDateObj) {
 					// 		return true;
@@ -351,23 +353,13 @@ module.exports = {
 					// 	}
 					// });
 
-					_.remove(activity_images, function (a) {
-						if (a.image_date && moment(a.image_date) < startDateObj) {
-							return true;
-						}
-						else {
-							return false;
-						}
-					});
-
-
 					if (startDateObj.isValid())
 						data.startDate = changeThaiFormat(startDateObj)
 				}
 
 				// Activities end date filter
 				if (endDate) {
-					var endDateObj = moment(endDate, 'M/D/YY', 'en');
+					endDateObj = moment(endDate, 'M/D/YY', 'en');
 					// _.remove(activity_images, function (a) {
 					// 	if (a.activity_start_date && endDateObj < moment(a.activity_start_date)) {
 					// 		return true;
@@ -376,16 +368,6 @@ module.exports = {
 					// 		return false;
 					// 	}
 					// });
-
-					_.remove(activity_images, function (a) {
-						if (a.image_date && endDateObj < moment(a.image_date)) {
-							return true;
-						}
-						else {
-							return false;
-						}
-					});
-
 
 					if (endDateObj.isValid())
 						data.endDate = changeThaiFormat(endDateObj)
@@ -443,36 +425,41 @@ module.exports = {
 						r.images = _.map(current, function (img) {
 							var image = {};
 
-							if (img.activity_image_file_name_left_column)
-								image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
+							if ((startDateObj < moment(img.activity_image_date_left_column) || startDateObj == null)
+								&& ((moment(img.activity_image_date_left_column) < endDateObj) || endDateObj == null)) {
+								if (img.activity_image_file_name_left_column)
+									image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
 
-							if (img.activity_image_file_name_right_column)
-								image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
+								if (img.activity_image_caption_left_column)
+									image.activity_image_caption_left_column = img.activity_image_caption_left_column;
+								else
+									image.activity_image_caption_left_column = '';
 
-							if (img.activity_image_caption_left_column)
-								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
-							else
-								image.activity_image_caption_left_column = '';
+								if (img.activity_image_caption_govt_left_column)
+									image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
+								else if (img.activity_image_caption_left_column)
+									image.activity_image_caption_govt_left_column = img.activity_image_caption_left_column;
+								else
+									image.activity_image_caption_govt_left_column = '';
+							}
 
-							if (img.activity_image_caption_right_column)
-								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
-							else
-								image.activity_image_caption_right_column = '';
+							if ((startDateObj < moment(img.activity_image_date_right_column) || startDateObj == null)
+								&& ((moment(img.activity_image_date_right_column) < endDateObj) || endDateObj == null)) {
+								if (img.activity_image_file_name_right_column)
+									image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
+								if (img.activity_image_caption_right_column)
+									image.activity_image_caption_right_column = img.activity_image_caption_right_column;
+								else
+									image.activity_image_caption_right_column = '';
 
-							if (img.activity_image_caption_govt_left_column)
-								image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
-							else if (img.activity_image_caption_left_column)
-								image.activity_image_caption_govt_left_column = img.activity_image_caption_left_column;
-							else
-								image.activity_image_caption_govt_left_column = '';
-
-							if (img.activity_image_caption_govt_right_column)
-								image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
-							else if (img.activity_image_caption_right_column)
-								image.activity_image_caption_govt_right_column = img.activity_image_caption_right_column;
-							else
-								image.activity_image_caption_govt_right_column = '';
+								if (img.activity_image_caption_govt_right_column)
+									image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
+								else if (img.activity_image_caption_right_column)
+									image.activity_image_caption_govt_right_column = img.activity_image_caption_right_column;
+								else
+									image.activity_image_caption_govt_right_column = '';
+							}
 
 							// Show page header
 							if (!r.activity_has_header && (image_row_number === 1 || (image_row_number - 1) % 2 === 0))
