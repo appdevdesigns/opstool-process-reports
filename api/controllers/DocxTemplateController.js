@@ -105,7 +105,7 @@ module.exports = {
 					// 		return false;
 					// });
 					_.remove(activityImages, function (a) {
-						if (a.date && moment(a.date) < startDateObj)
+						if (a.image_date && moment(a.image_date) < startDateObj)
 							return true;
 						else
 							return false;
@@ -126,7 +126,7 @@ module.exports = {
 					// 		return false;
 					// });
 					_.remove(activityImages, function (a) {
-						if (a.date && endDateObj < moment(a.date))
+						if (a.image_date && endDateObj < moment(a.image_date))
 							return true;
 						else
 							return false;
@@ -352,7 +352,7 @@ module.exports = {
 					// });
 
 					_.remove(activity_images, function (a) {
-						if (a.date && moment(a.date) < startDateObj) {
+						if (a.image_date && moment(a.image_date) < startDateObj) {
 							return true;
 						}
 						else {
@@ -378,7 +378,7 @@ module.exports = {
 					// });
 
 					_.remove(activity_images, function (a) {
-						if (a.date && endDateObj < moment(a.date)) {
+						if (a.image_date && endDateObj < moment(a.image_date)) {
 							return true;
 						}
 						else {
