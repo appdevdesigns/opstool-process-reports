@@ -98,8 +98,14 @@ module.exports = {
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
 
-					_.remove(activities, function (a) {
-						if (a.endDate && moment(a.endDate) < startDateObj)
+					// _.remove(activities, function (a) {
+					// 	if (a.endDate && moment(a.endDate) < startDateObj)
+					// 		return true;
+					// 	else
+					// 		return false;
+					// });
+					_.remove(activityImages, function (a) {
+						if (a.date && moment(a.date) < startDateObj)
 							return true;
 						else
 							return false;
@@ -112,8 +118,15 @@ module.exports = {
 				// Activities end date filter
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
-					_.remove(activities, function (a) {
-						if (a.startDate && endDateObj < moment(a.startDate))
+
+					// _.remove(activities, function (a) {
+					// 	if (a.startDate && endDateObj < moment(a.startDate))
+					// 		return true;
+					// 	else
+					// 		return false;
+					// });
+					_.remove(activityImages, function (a) {
+						if (a.date && endDateObj < moment(a.date))
 							return true;
 						else
 							return false;
@@ -329,14 +342,24 @@ module.exports = {
 				// Activities start date filter
 				if (startDate) {
 					var startDateObj = moment(startDate, 'M/D/YY', 'en');
+					// _.remove(activity_images, function (a) {
+					// 	if (a.activity_end_date && moment(a.activity_end_date) < startDateObj) {
+					// 		return true;
+					// 	}
+					// 	else {
+					// 		return false;
+					// 	}
+					// });
+
 					_.remove(activity_images, function (a) {
-						if (a.activity_end_date && moment(a.activity_end_date) < startDateObj) {
+						if (a.date && moment(a.date) < startDateObj) {
 							return true;
 						}
 						else {
 							return false;
 						}
 					});
+
 
 					if (startDateObj.isValid())
 						data.startDate = changeThaiFormat(startDateObj)
@@ -345,14 +368,24 @@ module.exports = {
 				// Activities end date filter
 				if (endDate) {
 					var endDateObj = moment(endDate, 'M/D/YY', 'en');
+					// _.remove(activity_images, function (a) {
+					// 	if (a.activity_start_date && endDateObj < moment(a.activity_start_date)) {
+					// 		return true;
+					// 	}
+					// 	else {
+					// 		return false;
+					// 	}
+					// });
+
 					_.remove(activity_images, function (a) {
-						if (a.activity_start_date && endDateObj < moment(a.activity_start_date)) {
+						if (a.date && endDateObj < moment(a.date)) {
 							return true;
 						}
 						else {
 							return false;
 						}
 					});
+
 
 					if (endDateObj.isValid())
 						data.endDate = changeThaiFormat(endDateObj)
