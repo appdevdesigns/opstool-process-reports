@@ -31,10 +31,10 @@ module.exports = {
 		var activityImages;
 		var resultBuffer;
 
-		var staffName = req.param('Member name');
+		var staffName = decodeURIComponent(req.param('Member name'));
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
-		var projectName = req.param('Project');
+		var projectName = decodeURIComponent(req.param('Project'));
 
 		var startDateObj, endDateObj;
 

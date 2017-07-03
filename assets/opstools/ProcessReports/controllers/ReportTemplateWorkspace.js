@@ -417,6 +417,12 @@ steal(
 										}
 
 										if (value) {
+											// Decode HTML
+											value = $('<div/>').html(value).text();
+
+											// Encode URI
+											value = encodeURIComponent(value);
+
 											var name = $(this).text().split(':')[0];
 											filter += name + '=' + value + '&';
 										}
