@@ -224,7 +224,7 @@ steal(
 
 										if (value) {
 											var name = $(this).text().split(':')[0];
-											filter += name + '=' + value + '&';
+											filter += name + '=' + encodeURIComponent(value) + '&';
 										}
 									});
 
