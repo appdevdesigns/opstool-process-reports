@@ -412,6 +412,12 @@ module.exports = {
 					if (img['activity_image_file_name_right_column'] == null || img['activity_image_file_name_right_column'] === 'blank.jpg')
 						delete img['activity_image_file_name_right_column'];
 
+					if (img['activity_image_date_left_column'] == null)
+						img['activity_image_date_left_column'] = '';
+
+					if (img['activity_image_date_right_column'] == null)
+						img['activity_image_date_right_column'] = '';
+
 					if (img['activity_image_caption_left_column'] == null)
 						img['activity_image_caption_left_column'] = '';
 
@@ -452,18 +458,22 @@ module.exports = {
 						r.images = _.map(current, function (img) {
 							var image = {};
 
+
 							if (img.activity_image_file_name_left_column)
 								image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
 
+							if (img.activity_image_date_left_column != "")
+								img.activity_image_date_left_column = changeThaiFormat(moment(img.activity_image_date_left_column), "DD/MM/YYYY");
+
 							if (img.activity_image_caption_left_column)
-								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
+								image.activity_image_caption_left_column = img.activity_image_date_left_column + " - " + img.activity_image_caption_left_column;
 							else
 								image.activity_image_caption_left_column = '';
 
 							if (img.activity_image_caption_govt_left_column)
-								image.activity_image_caption_govt_left_column = img.activity_image_caption_govt_left_column;
+								image.activity_image_caption_govt_left_column = img.activity_image_date_left_column + " - " + img.activity_image_caption_govt_left_column;
 							else if (img.activity_image_caption_left_column)
-								image.activity_image_caption_govt_left_column = img.activity_image_caption_left_column;
+								image.activity_image_caption_govt_left_column = image.activity_image_caption_left_column;
 							else
 								image.activity_image_caption_govt_left_column = '';
 
@@ -471,15 +481,18 @@ module.exports = {
 							if (img.activity_image_file_name_right_column)
 								image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
+							if (img.activity_image_date_right_column != "")
+								img.activity_image_date_right_column = changeThaiFormat(moment(img.activity_image_date_right_column), "DD/MM/YYYY");
+
 							if (img.activity_image_caption_right_column)
-								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
+								image.activity_image_caption_right_column = img.activity_image_date_right_column + " - " + img.activity_image_caption_right_column;
 							else
 								image.activity_image_caption_right_column = '';
 
 							if (img.activity_image_caption_govt_right_column)
-								image.activity_image_caption_govt_right_column = img.activity_image_caption_govt_right_column;
+								image.activity_image_caption_govt_right_column = img.activity_image_date_right_column + " - " + img.activity_image_caption_govt_right_column;
 							else if (img.activity_image_caption_right_column)
-								image.activity_image_caption_govt_right_column = img.activity_image_caption_right_column;
+								image.activity_image_caption_govt_right_column = image.activity_image_caption_right_column;
 							else
 								image.activity_image_caption_govt_right_column = '';
 
