@@ -466,7 +466,7 @@ module.exports = {
 								img.activity_image_date_left_column = changeThaiFormat(moment(img.activity_image_date_left_column), "DD/MM/YYYY");
 
 							if (img.activity_image_caption_left_column)
-								image.activity_image_caption_left_column = img.activity_image_date_left_column + " - " + img.activity_image_caption_left_column;
+								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
 							else
 								image.activity_image_caption_left_column = '';
 
@@ -485,7 +485,7 @@ module.exports = {
 								img.activity_image_date_right_column = changeThaiFormat(moment(img.activity_image_date_right_column), "DD/MM/YYYY");
 
 							if (img.activity_image_caption_right_column)
-								image.activity_image_caption_right_column = img.activity_image_date_right_column + " - " + img.activity_image_caption_right_column;
+								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
 							else
 								image.activity_image_caption_right_column = '';
 
