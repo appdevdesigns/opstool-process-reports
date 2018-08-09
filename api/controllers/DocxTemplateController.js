@@ -181,11 +181,9 @@ module.exports = {
 
 					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
 					activity_images.forEach(function (img) {
-
-						if (img.image_caption_govt) { // Government caption
-							s.activity_image_captions.addCaption(img.image_caption_govt);
-						}
-						else if (img.image_caption) { // Ministry caption
+						
+						// Aug 9, 2018 removed goverment caption because it is now the location information
+						if (img.image_caption) { // Activity caption
 							s.activity_image_captions.addCaption(img.image_caption);
 						}
 
