@@ -356,6 +356,13 @@ module.exports = {
 
 				for (var actId in groupedImages) {
 					var img = groupedImages[actId];
+					
+					img.forEach(function (img, index) {
+						img.sort_by = moment(img.image_date).format("MMDDYYYY");
+					});
+					
+					var img = _.orderBy(img, 'sort_by', 'asc'); // Use Lodash to sort array by 'date'
+
 					for (var i = 0; i < img.length; i += 2) {
 
 						var result = {
