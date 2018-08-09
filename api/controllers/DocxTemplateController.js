@@ -184,7 +184,7 @@ module.exports = {
 						
 						// Aug 9, 2018 removed goverment caption because it is now the location information
 						if (img.image_caption) { // Activity caption
-							s.activity_image_captions.addCaption(img.image_caption, moment(img.date, "YYYY-MM-DD").format("MMDDYYYY"));
+							s.activity_image_captions.addCaption(img.image_caption, moment(img.date, "YYYY-MM-DD").format("YYYYMMDD"));
 						}
 
 					});
@@ -358,7 +358,7 @@ module.exports = {
 					var img = groupedImages[actId];
 					
 					img.forEach(function (img, index) {
-						img.sort_by = moment(img.image_date, "YYYY-MM-DD").format("MMDDYYYY");
+						img.sort_by = moment(img.image_date, "YYYY-MM-DD").format("YYYYMMDD");
 					});
 					
 					var img = _.orderBy(img, 'sort_by', 'asc'); // Use Lodash to sort array by 'date'
