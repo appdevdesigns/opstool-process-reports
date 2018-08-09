@@ -163,8 +163,8 @@ module.exports = {
 					});
 
 					s.activity_image_captions = [];
-					s.activity_image_captions.runningOrder = 1;
-					s.activity_image_captions.addCaption = function (caption) {
+					// s.activity_image_captions.runningOrder = 1;
+					s.activity_image_captions.addCaption = function (caption, date) {
 						// Ampersand (&) is reserve work of word format.
 						caption = caption.replace(/&/g, 'and');
 
@@ -173,10 +173,10 @@ module.exports = {
 						// 	|| caption.indexOf('undefined') > -1) return;
 
 						this.push({
-							order: this.runningOrder,
-							caption: caption
+							caption: caption,
+							date: date
 						});
-						this.runningOrder++;
+						// this.runningOrder++;
 					};
 
 					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
@@ -184,7 +184,7 @@ module.exports = {
 						
 						// Aug 9, 2018 removed goverment caption because it is now the location information
 						if (img.image_caption) { // Activity caption
-							s.activity_image_captions.addCaption(img.image_caption);
+							s.activity_image_captions.addCaption(img.image_caption, moment(img.date).format("MMDDYYYY"));
 						}
 
 					});
@@ -201,13 +201,17 @@ module.exports = {
 					// 	absNumberRawXml += absNumberRawTemplate.replace(/#numId#/g, index + 3);
 					// 	numberItemRawXml += numberItemRawTemplate.replace(/#numId#/g, index + 3);
 					// }
+					
+					s.activity_image_captions = _.orderBy(s.activity_image_captions, 'date', 'asc'); // Use Lodash to sort array by 'date'
 
 					s.activitiesRawXml = '';
+					var order = 1;
 					if (s.activity_image_captions && s.activity_image_captions.length > 0) {
 						s.activity_image_captions.forEach(function (imgCaption) {
 							s.activitiesRawXml += ('<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:widowControl/><w:tabs><w:tab w:val="left" w:pos="540" w:leader="none"/></w:tabs><w:suppressAutoHyphens w:val="true"/><w:bidi w:val="0"/><w:spacing w:lineRule="auto" w:line="240" w:before="0" w:after="0"/><w:ind w:left="720" w:right="0" w:hanging="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:cs="Angsana New" w:ascii="Angsana New" w:hAnsi="Angsana New"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:cs="Angsana New" w:ascii="Angsana New" w:hAnsi="Angsana New"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t xml:space="preserve">#order#. #caption#</w:t></w:r></w:p>'
-								.replace('#order#', imgCaption.order)
+								.replace('#order#', order)
 								.replace('#caption#', imgCaption.caption));
+							order++;
 						});
 					}
 
