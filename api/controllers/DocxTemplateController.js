@@ -101,7 +101,7 @@ module.exports = {
 					startDateObj = moment(startDate, 'M/D/YY', 'en');
 
 					_.remove(activityImages, function (img) {
-						if (img.image_date && moment(img.image_date) < startDateObj)
+						if (img.image_date && moment(img.image_date, "YYYY-MM-DD") < startDateObj)
 							return true;
 						else
 							return false;
@@ -116,7 +116,7 @@ module.exports = {
 					endDateObj = moment(endDate, 'M/D/YY', 'en');
 
 					_.remove(activityImages, function (img) {
-						if (img.image_date && endDateObj < moment(img.image_date))
+						if (img.image_date && endDateObj < moment(img.image_date, "YYYY-MM-DD"))
 							return true;
 						else
 							return false;
@@ -184,7 +184,7 @@ module.exports = {
 						
 						// Aug 9, 2018 removed goverment caption because it is now the location information
 						if (img.image_caption) { // Activity caption
-							s.activity_image_captions.addCaption(img.image_caption, moment(img.date).format("MMDDYYYY"));
+							s.activity_image_captions.addCaption(img.image_caption, moment(img.date, "YYYY-MM-DD").format("MMDDYYYY"));
 						}
 
 					});
@@ -330,10 +330,10 @@ module.exports = {
 				}
 
 				_.remove(activity_images, function (img) {
-					if (startDateObj != null && (moment(img.image_date) < startDateObj)) {
+					if (startDateObj != null && (moment(img.image_date, "YYYY-MM-DD") < startDateObj)) {
 						return true;
 					}
-					else if (endDateObj != null && (moment(img.image_date) > endDateObj)) {
+					else if (endDateObj != null && (moment(img.image_date, "YYYY-MM-DD") > endDateObj)) {
 						return true;
 					}
 					else {
@@ -358,7 +358,7 @@ module.exports = {
 					var img = groupedImages[actId];
 					
 					img.forEach(function (img, index) {
-						img.sort_by = moment(img.image_date).format("MMDDYYYY");
+						img.sort_by = moment(img.image_date, "YYYY-MM-DD").format("MMDDYYYY");
 					});
 					
 					var img = _.orderBy(img, 'sort_by', 'asc'); // Use Lodash to sort array by 'date'
@@ -472,7 +472,7 @@ module.exports = {
 								image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
 
 							if (img.activity_image_date_left_column != "")
-								img.activity_image_date_left_column = changeThaiFormat(moment(img.activity_image_date_left_column), "DD/MM/YYYY");
+								img.activity_image_date_left_column = changeThaiFormat(moment(img.activity_image_date_left_column, "YYYY-MM-DD"), "DD/MM/YYYY");
 
 							if (img.activity_image_caption_left_column)
 								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
@@ -491,7 +491,7 @@ module.exports = {
 								image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
 							if (img.activity_image_date_right_column != "")
-								img.activity_image_date_right_column = changeThaiFormat(moment(img.activity_image_date_right_column), "DD/MM/YYYY");
+								img.activity_image_date_right_column = changeThaiFormat(moment(img.activity_image_date_right_column, "YYYY-MM-DD"), "DD/MM/YYYY");
 
 							if (img.activity_image_caption_right_column)
 								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
