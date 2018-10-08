@@ -101,7 +101,7 @@ module.exports = {
 					startDateObj = moment(startDate, 'M/D/YY', 'en');
 
 					_.remove(activityImages, function (img) {
-						if (img.image_date && moment(img.image_date) < startDateObj)
+						if (img.image_date && moment(img.image_date, "YYYY-MM-DD") < startDateObj)
 							return true;
 						else
 							return false;
@@ -116,7 +116,7 @@ module.exports = {
 					endDateObj = moment(endDate, 'M/D/YY', 'en');
 
 					_.remove(activityImages, function (img) {
-						if (img.image_date && endDateObj < moment(img.image_date))
+						if (img.image_date && endDateObj < moment(img.image_date, "YYYY-MM-DD"))
 							return true;
 						else
 							return false;
@@ -163,8 +163,8 @@ module.exports = {
 					});
 
 					s.activity_image_captions = [];
-					s.activity_image_captions.runningOrder = 1;
-					s.activity_image_captions.addCaption = function (caption) {
+					// s.activity_image_captions.runningOrder = 1;
+					s.activity_image_captions.addCaption = function (caption, date) {
 						// Ampersand (&) is reserve work of word format.
 						caption = caption.replace(/&/g, 'and');
 
@@ -173,20 +173,18 @@ module.exports = {
 						// 	|| caption.indexOf('undefined') > -1) return;
 
 						this.push({
-							order: this.runningOrder,
-							caption: caption
+							caption: caption,
+							date: date
 						});
-						this.runningOrder++;
+						// this.runningOrder++;
 					};
 
 					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
 					activity_images.forEach(function (img) {
-
-						if (img.image_caption_govt) { // Government caption
-							s.activity_image_captions.addCaption(img.image_caption_govt);
-						}
-						else if (img.image_caption) { // Ministry caption
-							s.activity_image_captions.addCaption(img.image_caption);
+						
+						// Aug 9, 2018 removed goverment caption because it is now the location information
+						if (img.image_caption) { // Activity caption
+							s.activity_image_captions.addCaption(img.image_caption, moment(img.date, "YYYY-MM-DD").format("YYYYMMDD"));
 						}
 
 					});
@@ -203,13 +201,17 @@ module.exports = {
 					// 	absNumberRawXml += absNumberRawTemplate.replace(/#numId#/g, index + 3);
 					// 	numberItemRawXml += numberItemRawTemplate.replace(/#numId#/g, index + 3);
 					// }
+					
+					s.activity_image_captions = _.orderBy(s.activity_image_captions, 'date', 'asc'); // Use Lodash to sort array by 'date'
 
 					s.activitiesRawXml = '';
+					var order = 1;
 					if (s.activity_image_captions && s.activity_image_captions.length > 0) {
 						s.activity_image_captions.forEach(function (imgCaption) {
 							s.activitiesRawXml += ('<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:widowControl/><w:tabs><w:tab w:val="left" w:pos="540" w:leader="none"/></w:tabs><w:suppressAutoHyphens w:val="true"/><w:bidi w:val="0"/><w:spacing w:lineRule="auto" w:line="240" w:before="0" w:after="0"/><w:ind w:left="720" w:right="0" w:hanging="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:cs="Angsana New" w:ascii="Angsana New" w:hAnsi="Angsana New"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:cs="Angsana New" w:ascii="Angsana New" w:hAnsi="Angsana New"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t xml:space="preserve">#order#. #caption#</w:t></w:r></w:p>'
-								.replace('#order#', imgCaption.order)
+								.replace('#order#', order)
 								.replace('#caption#', imgCaption.caption));
+							order++;
 						});
 					}
 
@@ -328,10 +330,10 @@ module.exports = {
 				}
 
 				_.remove(activity_images, function (img) {
-					if (startDateObj != null && (moment(img.image_date) < startDateObj)) {
+					if (startDateObj != null && (moment(img.image_date, "YYYY-MM-DD") < startDateObj)) {
 						return true;
 					}
-					else if (endDateObj != null && (moment(img.image_date) > endDateObj)) {
+					else if (endDateObj != null && (moment(img.image_date, "YYYY-MM-DD") > endDateObj)) {
 						return true;
 					}
 					else {
@@ -354,6 +356,13 @@ module.exports = {
 
 				for (var actId in groupedImages) {
 					var img = groupedImages[actId];
+					
+					img.forEach(function (img, index) {
+						img.sort_by = moment(img.image_date, "YYYY-MM-DD").format("YYYYMMDD");
+					});
+					
+					var img = _.orderBy(img, 'sort_by', 'asc'); // Use Lodash to sort array by 'date'
+
 					for (var i = 0; i < img.length; i += 2) {
 
 						var result = {
@@ -463,10 +472,10 @@ module.exports = {
 								image.activity_image_file_name_left_column = img.activity_image_file_name_left_column;
 
 							if (img.activity_image_date_left_column != "")
-								img.activity_image_date_left_column = changeThaiFormat(moment(img.activity_image_date_left_column), "DD/MM/YYYY");
+								img.activity_image_date_left_column = changeThaiFormat(moment(img.activity_image_date_left_column, "YYYY-MM-DD"), "DD/MM/YYYY");
 
 							if (img.activity_image_caption_left_column)
-								image.activity_image_caption_left_column = img.activity_image_date_left_column + " - " + img.activity_image_caption_left_column;
+								image.activity_image_caption_left_column = img.activity_image_caption_left_column;
 							else
 								image.activity_image_caption_left_column = '';
 
@@ -482,10 +491,10 @@ module.exports = {
 								image.activity_image_file_name_right_column = img.activity_image_file_name_right_column;
 
 							if (img.activity_image_date_right_column != "")
-								img.activity_image_date_right_column = changeThaiFormat(moment(img.activity_image_date_right_column), "DD/MM/YYYY");
+								img.activity_image_date_right_column = changeThaiFormat(moment(img.activity_image_date_right_column, "YYYY-MM-DD"), "DD/MM/YYYY");
 
 							if (img.activity_image_caption_right_column)
-								image.activity_image_caption_right_column = img.activity_image_date_right_column + " - " + img.activity_image_caption_right_column;
+								image.activity_image_caption_right_column = img.activity_image_caption_right_column;
 							else
 								image.activity_image_caption_right_column = '';
 
