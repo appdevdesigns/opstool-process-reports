@@ -601,9 +601,11 @@ module.exports = {
 	},
 
 	// /opstool-process-reports/docxtemplate/activity_image_list
-	activity_image_list: function (req, res) {
+	activity_image_list: function (req, res, options) {
 
 		AD.log('<green>::: docxtemplate.activity_image_list() :::</green>');
+
+		options = options || {};
 
 		var data = { staffs: null };
 		var activity_images;
@@ -739,7 +741,8 @@ module.exports = {
 						try {
 							if (tagName === 'file' && tagValue) {
 								// Get image binary
-								var imgContent = fs.readFileSync(__dirname + '/../../../../assets/data/fcf/images/activities/' + tagValue);
+								var folderPath = (options.imagePath || __dirname + '/../../../../assets/data/fcf/images/activities/');
+								var imgContent = fs.readFileSync(folderPath + tagValue);
 
 								return imgContent;
 							}
@@ -750,8 +753,8 @@ module.exports = {
 					},
 					getSize: function (imgBuffer, tagValue, tagName) {
 						if (imgBuffer) {
-							var maxWidth = 300;
-							var maxHeight = 160;
+							var maxWidth = 200;
+							var maxHeight = 200;
 
 							// Find aspect ratio image dimensions
 							var image = sizeOf(imgBuffer);

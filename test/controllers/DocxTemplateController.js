@@ -258,7 +258,9 @@ describe('FCF activity image list testing', () => {
 
     it('export DOCX report file', () => {
 
-        target.activity_image_list(req, res);
+        target.activity_image_list(req, res, {
+            imagePath: "./test_images/"
+        });
 
     });
 
