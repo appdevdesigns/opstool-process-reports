@@ -181,7 +181,7 @@ module.exports = {
 
 					var activity_images = _.filter(activityImages, function (img) { return s.person_id == img.person_id; });
 					activity_images.forEach(function (img) {
-						
+
 						// Aug 9, 2018 removed goverment caption because it is now the location information
 						if (img.image_caption) { // Activity caption
 							s.activity_image_captions.addCaption(img.image_caption, moment(img.date, "YYYY-MM-DD").format("YYYYMMDD"));
@@ -201,7 +201,7 @@ module.exports = {
 					// 	absNumberRawXml += absNumberRawTemplate.replace(/#numId#/g, index + 3);
 					// 	numberItemRawXml += numberItemRawTemplate.replace(/#numId#/g, index + 3);
 					// }
-					
+
 					s.activity_image_captions = _.orderBy(s.activity_image_captions, 'date', 'asc'); // Use Lodash to sort array by 'date'
 
 					s.activitiesRawXml = '';
@@ -356,11 +356,11 @@ module.exports = {
 
 				for (var actId in groupedImages) {
 					var img = groupedImages[actId];
-					
+
 					img.forEach(function (img, index) {
 						img.sort_by = moment(img.image_date, "YYYY-MM-DD").format("YYYYMMDD");
 					});
-					
+
 					var img = _.orderBy(img, 'sort_by', 'asc'); // Use Lodash to sort array by 'date'
 
 					for (var i = 0; i < img.length; i += 2) {
@@ -626,26 +626,30 @@ module.exports = {
 					// Get staffs data
 					function (callback) {
 
-						renderReportController.staffs(req, function (result, code) {
-							var r = JSON.parse(result);
-							if (r.status === 'success') {
-								data.staffs = r.data;
-							}
+						renderReportController.staffs(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									data.staffs = r.data;
+								}
 
-							callback();
+								callback();
+							}
 						});
 
 					},
 					// Get activity images data
 					function (callback) {
 
-						renderReportController.activity_images(req, function (result, code) {
-							var r = JSON.parse(result);
-							if (r.status === 'success') {
-								activity_images = r.data;
-							}
+						renderReportController.activity_images(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									activity_images = r.data;
+								}
 
-							callback();
+								callback();
+							}
 						});
 
 					}
@@ -679,7 +683,7 @@ module.exports = {
 					var dateMoment = moment(img.image_date);
 
 					// img.image_date = changeThaiFormat(dateMoment);
-					img.image_date = dateMoment.format('DD/MM/YYYY'); 
+					img.image_date = dateMoment.format('DD/MM/YYYY');
 
 					if (startDateObj != null && (dateMoment < startDateObj)) {
 						return true;

@@ -6,9 +6,9 @@ var proxyquire = require('proxyquire').noCallThru();
 // Mock data
 var mockRenderReportController = {
 
-    staffs: function (req, callback) {
+    staffs: function (req, res) {
 
-        callback(JSON.stringify({
+        res.send(JSON.stringify({
             status: 'success',
             data: [
                 {
@@ -62,9 +62,9 @@ var mockRenderReportController = {
 
     },
 
-    activity_images: function (req, callback) {
+    activity_images: function (req, res) {
 
-        callback(JSON.stringify({
+        res.send(JSON.stringify({
             status: 'success',
             data: [
                 {
