@@ -669,6 +669,12 @@ module.exports = {
 					});
 				}
 
+				if (projectName) {
+					_.remove(data.staffs, function (s) {
+						return s.project_title.indexOf(projectName) < 1;
+					});
+				}
+
 				// filter date
 				if (startDate) {
 					startDateObj = moment(startDate, 'M/D/YY', 'en');
@@ -732,6 +738,11 @@ module.exports = {
 
 					s.images = (activity_images.filter(img => img.person_id == s.person_id) || []);
 
+				});
+
+				// if no images,
+				_.remove(data.staffs, function (s) {
+					return s.images.length < 1;
 				});
 
 				next();
