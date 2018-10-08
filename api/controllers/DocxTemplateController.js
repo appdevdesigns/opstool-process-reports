@@ -589,5 +589,210 @@ module.exports = {
 
 			}
 		});
+	},
+
+	// /opstool-process-reports/docxtemplate/activity_image_list
+	activity_image_list: function (req, res) {
+
+		AD.log('<green>::: docxtemplate.activity_image_list() :::</green>');
+
+		var data = { staffs: null };
+		var activity_images;
+		var resultBuffer;
+
+		var staffName = req.param('Member name');
+		var startDate = req.param('Start date');
+		var endDate = req.param('End date');
+		var projectName = req.param('Project');
+
+		var startDateObj, endDateObj;
+
+		async.series([
+
+			// Get data
+			function (next) {
+				async.parallel([
+					// Get staffs data
+					function (callback) {
+
+						renderReportController.staffs(req, function (result, code) {
+							var r = JSON.parse(result);
+							if (r.status === 'success') {
+								data.staffs = r.data;
+							}
+
+							callback();
+						});
+
+					},
+					// Get activity images data
+					function (callback) {
+
+						renderReportController.activity_images(req, function (result, code) {
+							var r = JSON.parse(result);
+							if (r.status === 'success') {
+								activity_images = r.data;
+							}
+
+							callback();
+						});
+
+					}
+				], function (err) {
+					next(err);
+				});
+			},
+
+
+			// filter
+			function (next) {
+
+				// filter staffs
+				if (staffName) {
+					_.remove(data.staffs, function (s) {
+						return s.person_name.indexOf(staffName) < 1;
+					});
+				}
+
+				// filter date
+				if (startDate) {
+					startDateObj = moment(startDate, 'M/D/YY', 'en');
+				}
+
+				if (endDate) {
+					endDateObj = moment(endDate, 'M/D/YY', 'en');
+				}
+
+				_.remove(activity_images, function (img) {
+
+					var dateMoment = moment(img.image_date);
+
+					// img.image_date = changeThaiFormat(dateMoment);
+					img.image_date = dateMoment.format('DD/MM/YYYY'); 
+
+					if (startDateObj != null && (dateMoment < startDateObj)) {
+						return true;
+					}
+					else if (endDateObj != null && (dateMoment > endDateObj)) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				});
+
+
+				// Project name filter
+				if (projectName) {
+					_.remove(activity_images, function (img) {
+						return img.project_name != projectName;
+					});
+				}
+
+
+				next();
+			},
+
+			// subtract image fields
+			function (next) {
+
+				activity_images = activity_images.map(img => {
+					return {
+						date: img.image_date,
+						caption: img.image_caption,
+						location: img.image_caption_govt,
+						file: img.image_file_name,
+
+						person_id: img.person_id
+					};
+				});
+
+				next();
+			},
+
+			// pull images of staffs
+			function (next) {
+
+				data.staffs.forEach(s => {
+
+					s.images = (activity_images.filter(img => img.person_id == s.person_id) || []);
+
+				});
+
+				next();
+			},
+
+			// Generate docx file
+			function (next) {
+				var imageModule = new DocxImageModule({
+					centered: false,
+					getImage: function (tagValue, tagName) {
+						try {
+							if (tagName === 'file' && tagValue) {
+								// Get image binary
+								var imgContent = fs.readFileSync(__dirname + '/../../../../assets/data/fcf/images/activities/' + tagValue);
+
+								return imgContent;
+							}
+						}
+						catch (err) {
+							console.error(err);
+						}
+					},
+					getSize: function (imgBuffer, tagValue, tagName) {
+						if (imgBuffer) {
+							var maxWidth = 300;
+							var maxHeight = 160;
+
+							// Find aspect ratio image dimensions
+							var image = sizeOf(imgBuffer);
+							var ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
+
+							return [image.width * ratio, image.height * ratio];
+						}
+						else {
+							return [0, 0];
+						}
+					}
+				});
+
+				// TODO : Get file binary from database
+				fs.readFile(__dirname + "/../../docx templates/activity image list template.docx", "binary", function (err, content) {
+					var docx = new DocxGen()
+						.attachModule(imageModule)
+						.load(content)
+						.setData(data).render();
+
+					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
+
+					next();
+				});
+			}
+
+
+		], function (err, r) {
+
+			if (err) {
+
+				ADCore.comm.error(res, err, 500);
+			} else {
+
+				AD.log('<green>::: end docxtemplate.activity_image_list() :::</green>');
+
+				var buff = new Buffer(resultBuffer, 'binary');
+
+				res.set({
+					"Content-Disposition": 'attachment; filename="' + 'activity image list.docx' + '"',
+					"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+					"Content-Length": buff.length
+				});
+
+				res.send(buff);
+
+			}
+		});
+
 	}
+
+
 };
