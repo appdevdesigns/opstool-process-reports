@@ -608,6 +608,7 @@ module.exports = {
 		options = options || {};
 
 		var data = { staffs: null };
+		var activities;
 		var activity_images;
 		var resultBuffer;
 
@@ -637,6 +638,18 @@ module.exports = {
 							}
 						});
 
+					},
+					// Get activities data
+					function (callback) {
+						renderReportController.activities(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success')
+									activities = r.data;
+
+								callback();
+							}
+						});
 					},
 					// Get activity images data
 					function (callback) {
@@ -669,12 +682,6 @@ module.exports = {
 					});
 				}
 
-				if (projectName) {
-					_.remove(data.staffs, function (s) {
-						return s.project_title.indexOf(projectName) < 1;
-					});
-				}
-
 				// filter date
 				if (startDate) {
 					startDateObj = moment(startDate, 'M/D/YY', 'en');
@@ -688,7 +695,7 @@ module.exports = {
 
 					var dateMoment = moment(img.image_date);
 
-					// img.image_date = changeThaiFormat(dateMoment);
+					// date format
 					img.image_date = dateMoment.format('DD/MM/YYYY');
 
 					if (startDateObj != null && (dateMoment < startDateObj)) {
@@ -705,10 +712,18 @@ module.exports = {
 
 				// Project name filter
 				if (projectName) {
-					_.remove(activity_images, function (img) {
-						return img.project_name != projectName;
+					_.remove(activities, function (a) {
+						return a.project_name != projectName;
 					});
 				}
+
+				// Activity images filter
+				_.remove(activity_images, function (img) {
+					if (activities.filter(function (act) { return act.activity_id == img.activity_id; }).length < 1)
+						return true;
+					else
+						return false;
+				});
 
 
 				next();
@@ -736,7 +751,8 @@ module.exports = {
 
 				data.staffs.forEach(s => {
 
-					s.images = (activity_images.filter(img => img.person_id == s.person_id) || []);
+					s.images = (activity_images.filter(img => img.person_id == s.person_id) || [])
+								.sort((a, b) => moment(a.image_date, 'DD/MM/YYYY') - moment(b.image_date, 'DD/MM/YYYY')); // sorting 
 
 				});
 
