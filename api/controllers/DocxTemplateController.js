@@ -752,9 +752,10 @@ module.exports = {
 
 				staffs.forEach(s => {
 
-					s.images = (activity_images.filter(img => img.person_id == s.person_id) || [])
-								.sort((a, b) => moment(a.image_date, 'DD/MM/YYYY') - moment(b.image_date, 'DD/MM/YYYY')); // sorting 
+					s.images = (activity_images.filter(img => img.person_id == s.person_id) || []);
 
+					// sorting 
+					s.images.sort((a, b) => moment(a.date, 'DD/MM/YYYY').diff(moment(b.date, 'DD/MM/YYYY')) );
 				});
 
 				// if no images,
@@ -769,7 +770,7 @@ module.exports = {
 			// prepare data to report
 			function (next) {
 
-				let numberOfImgApage = 5;
+				let numberOfImgApage = 4;
 
 				staffs.forEach(s => {
 
