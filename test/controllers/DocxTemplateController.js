@@ -62,6 +62,38 @@ var mockRenderReportController = {
 
     },
 
+    activities: function (req, res) {
+
+        res.send(JSON.stringify({
+            "status": "success",
+            "data": [
+                {
+                    "person_id": 1,
+                    "activity_id": 1,
+                    "activity_name": "ทดสอบ",
+                    "activity_name_govt": "คำอธิบาย",
+                    "startDate": "2017-03-02T16:00:00.000Z",
+                    "endDate": "2017-03-02T16:00:00.000Z",
+                    "project_id": "PROJECT ID",
+                    "order": 1,
+                    "project_name": "PROJECT NAME"
+                },
+                {
+                    "person_id": 1,
+                    "activity_id": 2,
+                    "activity_name": "ทดสอบ2",
+                    "activity_name_govt": "คำอธิบาย2",
+                    "startDate": "2016-12-30T16:00:00.000Z",
+                    "endDate": "2017-12-29T16:00:00.000Z",
+                    "project_id": "PROJECT ID",
+                    "order": 2,
+                    "project_name": "PROJECT NAME"
+                },
+            ]
+        }));
+
+    },
+
     activity_images: function (req, res) {
 
         res.send(JSON.stringify({
@@ -72,7 +104,7 @@ var mockRenderReportController = {
                     "image_file_name": "721_5433_cc08b6f9-481d-4268-9bb0-38a3c91e4b2e_print.jpg",
                     "image_date": "2018-04-18T16:00:00.000Z",
                     "person_id": 1,
-                    "activity_id": 721,
+                    "activity_id": 1,
                     "image_caption": "ให้การสนับสนุนและดูแลเด็กและเยาวชนที่เข้าร่วมโครงการ",
                     "image_caption_govt": "",
                     "activity_name": "[th]Celebrating a birthday of a young person in our programme, assisting to build value and self worth. ",
@@ -89,7 +121,7 @@ var mockRenderReportController = {
                     "image_file_name": "578_6081_75bd9ffe-67d4-46d1-b1fe-904aa8fe6da3_print.jpeg",
                     "image_date": "2018-06-24T16:00:00.000Z",
                     "person_id": 1,
-                    "activity_id": 578,
+                    "activity_id": 1,
                     "image_caption": "เข้าร่วมประชุมเพื่อหาแนวทางในการให้ความรู้และอบรมแก่พ่อแม่บุญธรรมที่จะดูแลเด็กๆได้อย่างดี โดยมีผู้เข้าร่วมจากฝ่ายรับบุตรบุญธรรมจากบ้านเด็กชาย บ้านเวียงพิงค์และมูลนิธิ Care for Children\n",
                     "image_caption_govt": "สำนักงานมูลนิธิ Care for Children ต.ช้างเผือก\n",
                     "activity_name": "[th]Meeting with Government officials",
@@ -106,7 +138,7 @@ var mockRenderReportController = {
                     "image_file_name": "738_6082_c4998d0a-5937-4bcb-a28e-460d60045017_print.JPG",
                     "image_date": "2018-06-22T16:00:00.000Z",
                     "person_id": 1,
-                    "activity_id": 738,
+                    "activity_id": 1,
                     "image_caption": "จัดกิจกรรมให้เด็กๆ ได้เรียนรู้ประเทศข้อมูลของประเทศญี่ปุ่น เพื่อเปิดโลกให้กับเด็กๆมากขึ้น ",
                     "image_caption_govt": "โครงการฮัก ต.สุเทพ",
                     "activity_name": "[th]Molding Stars After School Program",
@@ -123,7 +155,7 @@ var mockRenderReportController = {
                     "image_file_name": "699_6083_816b3656-e058-4edf-8c13-0de1267dd5f4_print.JPG",
                     "image_date": "2018-06-28T16:00:00.000Z",
                     "person_id": 1,
-                    "activity_id": 699,
+                    "activity_id": 1,
                     "image_caption": "ไปเยี่ยมครอบครัวของเด็กเพื่อสร้างความสัมพันธ์ที่ดีและช่วยส่งเสริมให้ครอบครัวได้อยู่ร่วมกันและทำบทบาทหน้าที่พ่อแม่ได้อย่างดี\n",
                     "image_caption_govt": "อ.แม่ริม",
                     "activity_name": "[th]Building Family Dreams",
@@ -140,7 +172,7 @@ var mockRenderReportController = {
                     "image_file_name": "445_6084_27bce7a3-cff7-4092-b9e6-c101ea154e79_print.JPG",
                     "image_date": "2018-05-13T16:00:00.000Z",
                     "person_id": 1,
-                    "activity_id": 445,
+                    "activity_id": 2,
                     "image_caption": "ทานข้าวกับผู้สนับสนุนที่อเมริกาและได้รายงานสิ่งที่เกิดขึ้นในโครงการเมื่อปีที่แล้วให้กับผู้สนับสนุนทราบ\n",
                     "image_caption_govt": "ลอสแองเจลลิส แคริฟอร์เนีย อเมริกา\n",
                     "activity_name": "หาทุนสนับสนุนสำหรับโครงการ",
@@ -157,7 +189,7 @@ var mockRenderReportController = {
                     "image_file_name": "699_6132_6bffc223-ea55-4681-b952-5f640e070641_print.jpg",
                     "image_date": "2018-07-11T16:00:00.000Z",
                     "person_id": 1,
-                    "activity_id": 699,
+                    "activity_id": 2,
                     "image_caption": "ส่งเสริมเรื่องการออกทรัยพ์ให้กับเด็กๆ ด้วยการสอนให้พวกเขาทำออมสินด้วยตัวเอง",
                     "image_caption_govt": "โครงการ Jojo's Sanctuary",
                     "activity_name": "[th]Building Family Dreams",
@@ -174,7 +206,7 @@ var mockRenderReportController = {
                     "image_file_name": "699_6133_b734da54-79d2-4818-8191-b42c9123e879_print.jpg",
                     "image_date": "2018-07-10T16:00:00.000Z",
                     "person_id": 2,
-                    "activity_id": 699,
+                    "activity_id": 2,
                     "image_caption": "สอนบทเรียนในด้านการพัฒนาความสัมพันธ์ในครอบครัวและสังคมโดยจัดกิจกรรมให้พวกเขาร่วมกันหาวิธีแก้ไขปัญหา\n\n",
                     "image_caption_govt": "โครงการ Jojo's sanctuary ",
                     "activity_name": "[th]Building Family Dreams",
@@ -191,7 +223,7 @@ var mockRenderReportController = {
                     "image_file_name": "445_6157_d35cf4a2-8c7d-4a2e-b7b1-6e5b15b84c0e_print.jpg",
                     "image_date": "2018-06-13T16:00:00.000Z",
                     "person_id": 2,
-                    "activity_id": 445,
+                    "activity_id": 2,
                     "image_caption": "พูดแบ่งปันการทำงานที่ประเทศใทยให้กับผู้สนับสนุนชาวอเมริกา",
                     "image_caption_govt": "รัฐวอชิงตัน ประเทศสหรัฐอเมริกา",
                     "activity_name": "หาทุนสนับสนุนสำหรับโครงการ",

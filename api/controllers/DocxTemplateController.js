@@ -607,7 +607,8 @@ module.exports = {
 
 		options = options || {};
 
-		var data = { staffs: null };
+		var data = { pages: [] };
+		var staffs;
 		var activities;
 		var activity_images;
 		var resultBuffer;
@@ -631,7 +632,7 @@ module.exports = {
 							send: function (result, code) {
 								var r = JSON.parse(result);
 								if (r.status === 'success') {
-									data.staffs = r.data;
+									staffs = r.data;
 								}
 
 								callback();
@@ -677,7 +678,7 @@ module.exports = {
 
 				// filter staffs
 				if (staffName) {
-					_.remove(data.staffs, function (s) {
+					_.remove(staffs, function (s) {
 						return s.person_name.indexOf(staffName) < 1;
 					});
 				}
@@ -749,7 +750,7 @@ module.exports = {
 			// pull images of staffs
 			function (next) {
 
-				data.staffs.forEach(s => {
+				staffs.forEach(s => {
 
 					s.images = (activity_images.filter(img => img.person_id == s.person_id) || [])
 								.sort((a, b) => moment(a.image_date, 'DD/MM/YYYY') - moment(b.image_date, 'DD/MM/YYYY')); // sorting 
@@ -757,9 +758,38 @@ module.exports = {
 				});
 
 				// if no images,
-				_.remove(data.staffs, function (s) {
+				_.remove(staffs, function (s) {
 					return s.images.length < 1;
 				});
+
+				next();
+			},
+
+
+			// prepare data to report
+			function (next) {
+
+				let numberOfImgApage = 5;
+
+				staffs.forEach(s => {
+
+					// get each 5 images to a page
+					for (let index = 0; index < s.images.length; index += numberOfImgApage) {
+
+						var imgs = s.images.slice(index, index + numberOfImgApage);
+
+						data.pages.push({
+							project_title: s.project_title || projectName || "",
+							person_name_en: s.person_name_en,
+							person_name: s.person_name,
+							images: imgs
+						});
+
+					}
+
+
+				});
+
 
 				next();
 			},
