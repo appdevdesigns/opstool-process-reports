@@ -613,7 +613,7 @@ module.exports = {
 		var activity_images;
 		var resultBuffer;
 
-		var staffName = req.param('Member name');
+		var staffName = req.param('Person');
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
 		var projectName = req.param('Project');
@@ -678,8 +678,10 @@ module.exports = {
 
 				// filter staffs
 				if (staffName) {
+					staffName = staffName.trim();
+
 					_.remove(staffs, function (s) {
-						return s.person_name.indexOf(staffName) < 1;
+						return s.person_name_en.trim().indexOf(staffName) < 0;
 					});
 				}
 
