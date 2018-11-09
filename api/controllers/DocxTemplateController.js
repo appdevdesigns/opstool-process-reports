@@ -715,8 +715,11 @@ module.exports = {
 
 				// Project name filter
 				if (projectName) {
+					projectName = projectName.trim();
+
 					_.remove(activities, function (a) {
-						return a.project_name != projectName;
+						return (a.project_name || '').trim() != projectName && 
+								(a.project_name_nat || '').trim() != projectName;
 					});
 				}
 
