@@ -15,36 +15,8 @@ var AD = require('ad-utils'),
 	DocxImageModule = require('docxtemplater-image-module'),
 	sizeOf = require('image-size'),
 	*/
-	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js');
-
-
-/**
- * Perform Docx rendering in a separate thread.
- *
- * @param {object} options
- * 		See DocxWorker.js
- * @return {Promise}
- */
-var docxWorker = function(options) {
-	return new Promise((resolve, reject) => {
-		var worker = child_process.fork(__dirname + '/DocxWorker.js');
-		if (!worker) {
-			reject(new Error('Unable to launch DocxWorker.js'));
-		}
-		else {
-			worker.send(options);
-			worker.on('message', (msg) => {
-				worker.disconnect();
-				if (msg.error) {
-					reject(msg.error);
-				}
-				else {
-					resolve(msg);
-				}
-			});
-		}
-	});
-}
+	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js'),
+	docxWorker = require(__dirname + '/DocxWorker.js');
 
 
 var changeThaiFormat = function (momentDate, format) {
