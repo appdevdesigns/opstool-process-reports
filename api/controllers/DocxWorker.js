@@ -1,8 +1,7 @@
 /**
- * Render documents with Docx.
+ * Render documents with Docx in a separate thread.
  *
- * This script is intended to be executed as a forked process. It communicates
- * with the parent process through IPC messages.
+ * Communication with the thread is done through IPC messages.
  */
 
 // process.send() should only be available if this file was executed 
@@ -14,14 +13,18 @@ if (!process.send) {
 	
 	// Start the Docx worker child process. This will be reused for every 
 	// rendering job.
-	var workerProcess = child_process.fork(__dirname + '/DocxWorker.js');
+	var workerProcess = child_process.fork(__filename);
 	if (!workerProcess) {
-		console.error('Unable to launch DocxWorker.js');
+		var err = new Error('Unable to launch DocxWorker.js');
+		console.error(err);
+		// throw err;
 	}
-	var workerJobCount = 0;
 	process.on('exit', () => {
 		workerProcess && workerProcess.kill();
 	});
+	
+	// Used to assign worker jobID values
+	var workerJobCount = 0;
 	
 	/**
 	 * Perform Docx rendering in a separate thread.
@@ -52,11 +55,20 @@ if (!process.send) {
 				// Each job has a unique ID
 				options.jobID = workerJobCount;
 				workerJobCount += 1;
+				if (workerJobCount >= Number.MAX_SAFE_INTEGER) {
+					// Wrap around to 0
+					workerJobCount = 0;
+				}
 				
+				// Send job to worker process
 				workerProcess.send(options);
+				
+				// Receive results from worker process
 				var messageHandler = function(msg) {
 					if (msg.jobID == options.jobID) {
+						// Clean up
 						workerProcess.removeListener('message', messageHandler);
+						// Deliver
 						if (msg.error) {
 							reject(msg.error);
 						}
@@ -81,87 +93,98 @@ else {
 	var path = require('path');
 	var async = require('async');
 	
+	// Receive job from parent process
 	process.on('message', (msg) => {
-		if (msg && msg.data && msg.templateFile) {
-			var output = null;
-			var docx = new DocxGen();
+		var output = null;
+		var docx = new DocxGen();
+		
+		async.series([
 			
-			async.series([
-				
-				// Prepare image plugin (optional)
-				(next) => {
-					if (msg.image) {
-						var imageModule = new DocxImageModule({
-							centered: false,
-							getImage: (tagValue, tagName) => {
-								try {
-									// Only use images with a matching tagName
-									var nameMatch = true;
-									if (msg.image.tagNames && msg.image.tagNames.indexOf(tagName) < 0) {
-										nameMatch = false;
-									}
-									if (tagValue && nameMatch) {
-										var imgContent = fs.readFileSync(
-											path.join(msg.image.path, tagValue)
-										);
-										return imgContent;
-									}
-								}
-								catch (err) {
-									console.error(err);
-								}
-							},
-							getSize: (imgBuffer, tagValue, tagName) => {
-								if (imgBuffer) {
-									// Find apsect ratio image dimensions
-									var image = sizeOf(imgBuffer);
-									var ratio = Math.min(msg.image.maxWidth / image.width, msg.maxHeight / image.height);
-									
-									return [image.width * ratio, image.height * ratio];
-								}
-								else {
-									return [0, 0];
-								}
-							}
-						});
-						docx.attachModule(imageModule);
-					}
-					next();
-				},
-				
-				// Read template file
-				(next) => {
-					fs.readFile(msg.templateFile, 'binary', (err, templateContent) => {
-						if (err) next(err);
-						else {
-							docx.load(templateContent);
-							next();
-						}
-					});
-				},
-				
-				// Render doc
-				(next) => {
-					docx.setData(msg.data).render();
-					output = docx.getZip().generate({ type: 'nodebuffer' });
-					next();
-				},
-			
-			], (err) => {
-				// Send results back to parent process
-				if (err) {
-					process.send({
-						jobID: msg.jobID,
-						error: err,
-					});
+			// Preliminary checks
+			(next) => {
+				if (!msg || !msg.data || !msg.templateFile) {
+					next(new TypeError('Incorrect parameters given for docxWorker'));
 				}
 				else {
-					process.send({
-						jobID: msg.jobID,
-						result: output,
-					});
+					next();
 				}
-			});
-		}
+			},
+			
+			// Prepare image plugin (optional)
+			(next) => {
+				if (msg.image) {
+					var imageModule = new DocxImageModule({
+						centered: false,
+						getImage: (tagValue, tagName) => {
+							try {
+								// Only use images with a matching tagName
+								var nameMatch = true;
+								if (msg.image.tagNames && msg.image.tagNames.indexOf(tagName) < 0) {
+									nameMatch = false;
+								}
+								if (tagValue && nameMatch) {
+									var imgContent = fs.readFileSync(
+										path.join(msg.image.path, tagValue)
+									);
+									return imgContent;
+								}
+							}
+							catch (err) {
+								console.error(err);
+							}
+						},
+						getSize: (imgBuffer, tagValue, tagName) => {
+							if (imgBuffer) {
+								// Find apsect ratio image dimensions
+								var image = sizeOf(imgBuffer);
+								var ratio = Math.min(msg.image.maxWidth / image.width, msg.maxHeight / image.height);
+								
+								return [image.width * ratio, image.height * ratio];
+							}
+							else {
+								return [0, 0];
+							}
+						}
+					});
+					docx.attachModule(imageModule);
+				}
+				next();
+			},
+			
+			// Read template file
+			(next) => {
+				fs.readFile(msg.templateFile, 'binary', (err, templateContent) => {
+					if (err) next(err);
+					else {
+						docx.load(templateContent);
+						next();
+					}
+				});
+			},
+			
+			// Render doc
+			(next) => {
+				docx.setData(msg.data).render();
+				output = docx.getZip().generate({ type: 'nodebuffer' });
+				next();
+			},
+		
+		], (err) => {
+			// Send results back to parent process
+			if (err) {
+				console.error('DocxWorker error:', err);
+				process.send({
+					jobID: msg.jobID,
+					// Error() objects won't pass through IPC
+					error: err.message || err
+				});
+			}
+			else {
+				process.send({
+					jobID: msg.jobID,
+					result: output,
+				});
+			}
+		});
 	});
 }
