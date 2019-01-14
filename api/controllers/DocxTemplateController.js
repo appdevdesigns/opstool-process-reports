@@ -8,13 +8,6 @@ var AD = require('ad-utils'),
 	async = require('async'),
 	_ = require('lodash'),
 	moment = require('moment'),
-	fs = require('fs'),
-	child_process = require('child_process'),
-	/*
-	DocxGen = require('docxtemplater'),
-	DocxImageModule = require('docxtemplater-image-module'),
-	sizeOf = require('image-size'),
-	*/
 	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js'),
 	docxWorker = require(__dirname + '/DocxWorker.js');
 
@@ -234,18 +227,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				/*
-				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function (err, content) {
-					var docx = new DocxGen()
-						.load(content)
-						.setData(data).render();
-
-					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
-
-					next();
-				});
-				*/
 				docxWorker({
 					templateFile: __dirname + "/../../docx templates/activities template.docx",
 					data: data
@@ -547,52 +528,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				/*
-				var imageModule = new DocxImageModule({
-					centered: false,
-					getImage: function (tagValue, tagName) {
-						try {
-							if ((tagName === 'activity_image_file_name_left_column' || tagName === 'activity_image_file_name_right_column') && tagValue) {
-								// Get image binary
-								var imgContent = fs.readFileSync(__dirname + '/../../../../assets/data/fcf/images/activities/' + tagValue);
-
-								return imgContent;
-							}
-						}
-						catch (err) {
-							console.error(err);
-						}
-					},
-					getSize: function (imgBuffer, tagValue, tagName) {
-						if (imgBuffer) {
-							var maxWidth = 300;
-							var maxHeight = 160;
-
-							// Find aspect ratio image dimensions
-							var image = sizeOf(imgBuffer);
-							var ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
-
-							return [image.width * ratio, image.height * ratio];
-						}
-						else {
-							return [0, 0];
-						}
-					}
-				});
-
-				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activity images template.docx", "binary", function (err, content) {
-					var docx = new DocxGen()
-						.attachModule(imageModule)
-						.load(content)
-						.setData(data).render();
-
-					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
-
-					next();
-				});
-				*/
-				
 				docxWorker({
 					templateFile: __dirname + "/../../docx templates/activity images template.docx",
 					data: data,
@@ -837,52 +772,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				/*
-				var imageModule = new DocxImageModule({
-					centered: false,
-					getImage: function (tagValue, tagName) {
-						try {
-							if (tagName === 'file' && tagValue) {
-								// Get image binary
-								var folderPath = (options.imagePath || __dirname + '/../../../../assets/data/fcf/images/activities/');
-								var imgContent = fs.readFileSync(folderPath + tagValue);
-
-								return imgContent;
-							}
-						}
-						catch (err) {
-							console.error(err);
-						}
-					},
-					getSize: function (imgBuffer, tagValue, tagName) {
-						if (imgBuffer) {
-							var maxWidth = 200;
-							var maxHeight = 160;
-
-							// Find aspect ratio image dimensions
-							var image = sizeOf(imgBuffer);
-							var ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
-
-							return [image.width * ratio, image.height * ratio];
-						}
-						else {
-							return [0, 0];
-						}
-					}
-				});
-
-				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activity image list template.docx", "binary", function (err, content) {
-					var docx = new DocxGen()
-						.attachModule(imageModule)
-						.load(content)
-						.setData(data).render();
-
-					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
-
-					next();
-				});
-				*/
 				docxWorker({
 					templateFile: __dirname + "/../../docx templates/activity image list template.docx",
 					data: data,

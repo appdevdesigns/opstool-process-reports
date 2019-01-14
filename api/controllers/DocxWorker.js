@@ -8,6 +8,7 @@
 // with child_process.fork(). If not, then this file was added with require().
 
 // For require()
+// This is the parent process.
 if (!process.send) {
 	var child_process = require('child_process');
 	
@@ -43,6 +44,8 @@ if (!process.send) {
 	 * @param {array} [options.image.tagNames]
 	 *		Use images with these tagNames.
 	 *		Array of strings.
+	 * @param {boolean} [options.image.centered]
+	 *		Default is false.
 	 *
 	 * @return {Promise}
 	 */
@@ -85,6 +88,7 @@ if (!process.send) {
 
 
 // For fork()
+// This is the worker process.
 else {
 	var DocxGen = require('docxtemplater');
 	var DocxImageModule = require('docxtemplater-image-module');
@@ -114,8 +118,9 @@ else {
 			(next) => {
 				if (msg.image) {
 					var imageModule = new DocxImageModule({
-						centered: false,
+						centered: msg.image.centered || false,
 						getImage: (tagValue, tagName) => {
+							var imageFilename = path.join(msg.image.path, tagValue);
 							try {
 								// Only use images with a matching tagName
 								var nameMatch = true;
@@ -123,14 +128,15 @@ else {
 									nameMatch = false;
 								}
 								if (tagValue && nameMatch) {
-									var imgContent = fs.readFileSync(
-										path.join(msg.image.path, tagValue)
-									);
+									var imgContent = fs.readFileSync(imageFilename);
 									return imgContent;
 								}
 							}
 							catch (err) {
-								console.error(err);
+								if (err.code == 'ENOENT') {
+									console.error("DocxGen can't read image file: " + imageFilename);
+								}
+								else console.error(err);
 							}
 						},
 						getSize: (imgBuffer, tagValue, tagName) => {
