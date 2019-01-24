@@ -9,43 +9,10 @@ var AD = require('ad-utils'),
 	_ = require('lodash'),
 	moment = require('moment'),
 	fs = require('fs'),
-	child_process = require('child_process'),
-	/*
 	DocxGen = require('docxtemplater'),
 	DocxImageModule = require('docxtemplater-image-module'),
 	sizeOf = require('image-size'),
-	*/
 	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js');
-
-
-/**
- * Perform Docx rendering in a separate thread.
- *
- * @param {object} options
- * 		See DocxWorker.js
- * @return {Promise}
- */
-var docxWorker = function(options) {
-	return new Promise((resolve, reject) => {
-		var worker = child_process.fork(__dirname + '/DocxWorker.js');
-		if (!worker) {
-			reject(new Error('Unable to launch DocxWorker.js'));
-		}
-		else {
-			worker.send(options);
-			worker.on('message', (msg) => {
-				worker.disconnect();
-				if (msg.error) {
-					reject(msg.error);
-				}
-				else {
-					resolve(msg);
-				}
-			});
-		}
-	});
-}
-
 
 var changeThaiFormat = function (momentDate, format) {
 	if (!format)
@@ -262,7 +229,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				/*
 				// TODO : Get file binary from database
 				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function (err, content) {
 					var docx = new DocxGen()
@@ -273,23 +239,15 @@ module.exports = {
 
 					next();
 				});
-				*/
-				docxWorker({
-					templateFile: __dirname + "/../../docx templates/activities template.docx",
-					data: data
-				})
-				.then((result) => {
-					resultBuffer = result;
-					next();
-				})
-				.catch(next);
 			}
 
 		], function (err, r) {
+
 			if (err) {
+
 				ADCore.comm.error(res, err, 500);
 			} else {
-				
+
 				AD.log('<green>::: end docxtemplate.activities() :::</green>');
 
 				var buff = new Buffer(resultBuffer, 'binary');
@@ -575,7 +533,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				/*
 				var imageModule = new DocxImageModule({
 					centered: false,
 					getImage: function (tagValue, tagName) {
@@ -619,26 +576,6 @@ module.exports = {
 
 					next();
 				});
-				*/
-				
-				docxWorker({
-					templateFile: __dirname + "/../../docx templates/activity images template.docx",
-					data: data,
-					image: {
-						path: __dirname + '/../../../../assets/data/fcf/images/activities/',
-						maxWidth: 300,
-						maxHeight: 160,
-						tagNames: [
-							'activity_image_file_name_left_column',
-							'activity_image_file_name_right_column'
-						]
-					}
-				})
-				.then((result) => {
-					resultBuffer = result;
-					next();
-				})
-				.catch(next);
 			}
 		], function (err, r) {
 
@@ -865,7 +802,6 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				/*
 				var imageModule = new DocxImageModule({
 					centered: false,
 					getImage: function (tagValue, tagName) {
@@ -910,22 +846,6 @@ module.exports = {
 
 					next();
 				});
-				*/
-				docxWorker({
-					templateFile: __dirname + "/../../docx templates/activity image list template.docx",
-					data: data,
-					image: {
-						path: options.imagePath || __dirname + '/../../../../assets/data/fcf/images/activities/',
-						maxWidth: 200,
-						maxHeight: 160,
-						tagNames: [ 'file' ],
-					}
-				})
-				.then((result) => {
-					resultBuffer = result;
-					next();
-				})
-				.catch(next);
 			}
 
 
