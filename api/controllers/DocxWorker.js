@@ -143,7 +143,7 @@ else {
 							if (imgBuffer) {
 								// Find apsect ratio image dimensions
 								var image = sizeOf(imgBuffer);
-								var ratio = Math.min(msg.image.maxWidth / image.width, msg.maxHeight / image.height);
+								var ratio = Math.min(msg.image.maxWidth / image.width, msg.image.maxHeight / image.height);
 								
 								return [image.width * ratio, image.height * ratio];
 							}
