@@ -8,11 +8,9 @@ var AD = require('ad-utils'),
 	async = require('async'),
 	_ = require('lodash'),
 	moment = require('moment'),
-	fs = require('fs'),
-	DocxGen = require('docxtemplater'),
-	DocxImageModule = require('docxtemplater-image-module'),
-	sizeOf = require('image-size'),
-	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js');
+	renderReportController = require('fcf_activities/api/controllers/RenderReportController.js'),
+	docxWorker = require(__dirname + '/DocxWorker.js');
+
 
 var changeThaiFormat = function (momentDate, format) {
 	if (!format)
@@ -229,25 +227,22 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activities template.docx", "binary", function (err, content) {
-					var docx = new DocxGen()
-						.load(content)
-						.setData(data).render();
-
-					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
-
+				docxWorker({
+					templateFile: __dirname + "/../../docx templates/activities template.docx",
+					data: data
+				})
+				.then((result) => {
+					resultBuffer = result;
 					next();
-				});
+				})
+				.catch(next);
 			}
 
 		], function (err, r) {
-
 			if (err) {
-
 				ADCore.comm.error(res, err, 500);
 			} else {
-
+				
 				AD.log('<green>::: end docxtemplate.activities() :::</green>');
 
 				var buff = new Buffer(resultBuffer, 'binary');
@@ -533,49 +528,24 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				var imageModule = new DocxImageModule({
-					centered: false,
-					getImage: function (tagValue, tagName) {
-						try {
-							if ((tagName === 'activity_image_file_name_left_column' || tagName === 'activity_image_file_name_right_column') && tagValue) {
-								// Get image binary
-								var imgContent = fs.readFileSync(__dirname + '/../../../../assets/data/fcf/images/activities/' + tagValue);
-
-								return imgContent;
-							}
-						}
-						catch (err) {
-							console.error(err);
-						}
-					},
-					getSize: function (imgBuffer, tagValue, tagName) {
-						if (imgBuffer) {
-							var maxWidth = 300;
-							var maxHeight = 160;
-
-							// Find aspect ratio image dimensions
-							var image = sizeOf(imgBuffer);
-							var ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
-
-							return [image.width * ratio, image.height * ratio];
-						}
-						else {
-							return [0, 0];
-						}
+				docxWorker({
+					templateFile: __dirname + "/../../docx templates/activity images template.docx",
+					data: data,
+					image: {
+						path: __dirname + '/../../../../assets/data/fcf/images/activities/',
+						maxWidth: 300,
+						maxHeight: 160,
+						tagNames: [
+							'activity_image_file_name_left_column',
+							'activity_image_file_name_right_column'
+						]
 					}
-				});
-
-				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activity images template.docx", "binary", function (err, content) {
-					var docx = new DocxGen()
-						.attachModule(imageModule)
-						.load(content)
-						.setData(data).render();
-
-					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
-
+				})
+				.then((result) => {
+					resultBuffer = result;
 					next();
-				});
+				})
+				.catch(next);
 			}
 		], function (err, r) {
 
@@ -802,50 +772,21 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
-				var imageModule = new DocxImageModule({
-					centered: false,
-					getImage: function (tagValue, tagName) {
-						try {
-							if (tagName === 'file' && tagValue) {
-								// Get image binary
-								var folderPath = (options.imagePath || __dirname + '/../../../../assets/data/fcf/images/activities/');
-								var imgContent = fs.readFileSync(folderPath + tagValue);
-
-								return imgContent;
-							}
-						}
-						catch (err) {
-							console.error(err);
-						}
-					},
-					getSize: function (imgBuffer, tagValue, tagName) {
-						if (imgBuffer) {
-							var maxWidth = 200;
-							var maxHeight = 160;
-
-							// Find aspect ratio image dimensions
-							var image = sizeOf(imgBuffer);
-							var ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
-
-							return [image.width * ratio, image.height * ratio];
-						}
-						else {
-							return [0, 0];
-						}
+				docxWorker({
+					templateFile: __dirname + "/../../docx templates/activity image list template.docx",
+					data: data,
+					image: {
+						path: options.imagePath || __dirname + '/../../../../assets/data/fcf/images/activities/',
+						maxWidth: 200,
+						maxHeight: 160,
+						tagNames: [ 'file' ],
 					}
-				});
-
-				// TODO : Get file binary from database
-				fs.readFile(__dirname + "/../../docx templates/activity image list template.docx", "binary", function (err, content) {
-					var docx = new DocxGen()
-						.attachModule(imageModule)
-						.load(content)
-						.setData(data).render();
-
-					resultBuffer = docx.getZip().generate({ type: "nodebuffer" });
-
+				})
+				.then((result) => {
+					resultBuffer = result;
 					next();
-				});
+				})
+				.catch(next);
 			}
 
 
