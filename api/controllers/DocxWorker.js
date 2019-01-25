@@ -114,6 +114,17 @@ else {
 				}
 			},
 			
+			// Read template file
+			(next) => {
+				fs.readFile(msg.templateFile, 'binary', (err, templateContent) => {
+					if (err) next(err);
+					else {
+						docx.load(templateContent);
+						next();
+					}
+				});
+			},
+			
 			// Prepare image plugin (optional)
 			(next) => {
 				if (msg.image) {
@@ -155,17 +166,6 @@ else {
 					docx.attachModule(imageModule);
 				}
 				next();
-			},
-			
-			// Read template file
-			(next) => {
-				fs.readFile(msg.templateFile, 'binary', (err, templateContent) => {
-					if (err) next(err);
-					else {
-						docx.load(templateContent);
-						next();
-					}
-				});
 			},
 			
 			// Render doc
