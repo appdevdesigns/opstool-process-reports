@@ -76,7 +76,7 @@ if (!process.send) {
 							reject(msg.error);
 						}
 						else {
-							resolve(msg.result);
+							resolve(Buffer.from(msg.result, 'base64'));
 						}
 					}
 				};
@@ -188,7 +188,8 @@ else {
 			else {
 				process.send({
 					jobID: msg.jobID,
-					result: output,
+					// Sending as base64 seems faster
+					result: output.toString('base64'),
 				});
 			}
 		});
