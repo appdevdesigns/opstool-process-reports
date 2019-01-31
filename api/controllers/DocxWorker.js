@@ -1,5 +1,6 @@
 /**
- * Render documents with Docx in a separate thread.
+ * Render documents with Docx in a separate thread, then save result to a
+ * temporary file.
  *
  * Communication with the thread is done through IPC messages.
  */
@@ -48,6 +49,10 @@ if (!process.send) {
 	 *		Default is false.
 	 *
 	 * @return {Promise}
+	 *		{ 
+	 *			"name": <full path to rendered file>,
+	 *			"length": <size of rendered file>
+	 *		}
 	 */
 	module.exports = function docxWorker(options) {
 		return new Promise((resolve, reject) => {
@@ -76,7 +81,7 @@ if (!process.send) {
 							reject(msg.error);
 						}
 						else {
-							resolve(Buffer.from(msg.result, 'base64'));
+							resolve(msg.tempFile);
 						}
 					}
 				};
@@ -96,11 +101,14 @@ else {
 	var fs = require('fs');
 	var path = require('path');
 	var async = require('async');
+	var uuid = require('uuid/v1');
+	var os = require('os');
 	
 	// Receive job from parent process
 	process.on('message', (msg) => {
-		var output = null;
 		var docx = new DocxGen();
+		var tempFileName = path.join(os.tmpDir(), 'docx-' + uuid());
+		var tempFileLength;
 		
 		async.series([
 			
@@ -168,11 +176,15 @@ else {
 				next();
 			},
 			
-			// Render doc
+			// Render doc and save to disk
 			(next) => {
 				docx.setData(msg.data).render();
-				output = docx.getZip().generate({ type: 'nodebuffer' });
-				next();
+				var output = docx.getZip().generate({ type: 'nodebuffer' });
+				tempFileLength = output.length;
+				fs.writeFile(tempFileName, output, (err) => {
+					if (err) next(err);
+					else next();
+				});
 			},
 		
 		], (err) => {
@@ -188,8 +200,10 @@ else {
 			else {
 				process.send({
 					jobID: msg.jobID,
-					// Sending as base64 seems faster
-					result: output.toString('base64'),
+					tempFile: {
+						name: tempFileName,
+						length: tempFileLength
+					}
 				});
 			}
 		});

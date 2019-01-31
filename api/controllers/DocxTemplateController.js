@@ -5,6 +5,7 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 var AD = require('ad-utils'),
+	fs = require('fs'),
 	async = require('async'),
 	_ = require('lodash'),
 	moment = require('moment'),
@@ -27,7 +28,7 @@ module.exports = {
 		var data = { staffs: null };
 		var activities;
 		var activityImages;
-		var resultBuffer;
+		var tempFile = {};
 
 		var staffName = req.param('Member name');
 		var startDate = req.param('Start date');
@@ -232,7 +233,7 @@ module.exports = {
 					data: data
 				})
 				.then((result) => {
-					resultBuffer = result;
+					tempFile = result;
 					next();
 				})
 				.catch(next);
@@ -245,15 +246,22 @@ module.exports = {
 				
 				AD.log('<green>::: end docxtemplate.activities() :::</green>');
 
-				var buff = new Buffer(resultBuffer, 'binary');
-
 				res.set({
 					"Content-Disposition": 'attachment; filename="' + 'activities.docx' + '"',
 					"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-					"Content-Length": buff.length
+					"Content-Length": tempFile.length
 				});
 
-				res.send(buff);
+				// Stream file to client
+				// (no need to read entire file into memory first)
+				var stream = fs.createReadStream(tempFile.name);
+				stream.pipe(res);
+				stream.on('end', () => {
+					// Clean up temp file
+					fs.unlink(tempFile.name, (err) => {
+						if (err) sails.log.error(err);
+					});
+				});
 			}
 		});
 	},
@@ -264,7 +272,7 @@ module.exports = {
 
 		var data = { staffs: null };
 		var activity_images;
-		var resultBuffer;
+		var tempFile = {};
 
 		var staffName = req.param('Member name');
 		var startDate = req.param('Start date');
@@ -542,7 +550,7 @@ module.exports = {
 					}
 				})
 				.then((result) => {
-					resultBuffer = result;
+					tempFile = result;
 					next();
 				})
 				.catch(next);
@@ -555,17 +563,24 @@ module.exports = {
 			} else {
 
 				AD.log('<green>::: end docxtemplate.activity_images() :::</green>');
-
-				var buff = new Buffer(resultBuffer, 'binary');
-
+				
 				res.set({
 					"Content-Disposition": 'attachment; filename="' + 'activity images.docx' + '"',
 					"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-					"Content-Length": buff.length
+					"Content-Length": tempFile.length
 				});
-
-				res.send(buff);
-
+				
+				// Stream file to client
+				// (no need to read entire file into memory first)
+				var stream = fs.createReadStream(tempFile.name);
+				stream.pipe(res);
+				stream.on('end', () => {
+					// Clean up temp file
+					fs.unlink(tempFile.name, (err) => {
+						if (err) sails.log.error(err);
+					});
+				});
+				
 			}
 		});
 	},
@@ -581,7 +596,7 @@ module.exports = {
 		var staffs;
 		var activities;
 		var activity_images;
-		var resultBuffer;
+		var tempFile = {};
 
 		var staffName = req.param('Person');
 		var startDate = req.param('Start date');
@@ -783,7 +798,7 @@ module.exports = {
 					}
 				})
 				.then((result) => {
-					resultBuffer = result;
+					tempFile = result;
 					next();
 				})
 				.catch(next);
@@ -799,16 +814,23 @@ module.exports = {
 
 				AD.log('<green>::: end docxtemplate.activity_image_list() :::</green>');
 
-				var buff = new Buffer(resultBuffer, 'binary');
-
 				res.set({
 					"Content-Disposition": 'attachment; filename="' + 'activity image list.docx' + '"',
 					"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-					"Content-Length": buff.length
+					"Content-Length": tempFile.length
 				});
-
-				res.send(buff);
-
+				
+				// Stream file to client
+				// (no need to read entire file into memory first)
+				var stream = fs.createReadStream(tempFile.name);
+				stream.pipe(res);
+				stream.on('end', () => {
+					// Clean up temp file
+					fs.unlink(tempFile.name, (err) => {
+						if (err) sails.log.error(err);
+					});
+				});
+				
 			}
 		});
 
