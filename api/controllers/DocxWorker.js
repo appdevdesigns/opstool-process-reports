@@ -6,24 +6,42 @@
  */
 
 // process.send() should only be available if this file was executed 
-// with child_process.fork(). If not, then this file was added with require().
+// with child_process.fork(). If not, then this file was added with require()
+// meaning we are in the parent process.
 
-// For require()
 // This is the parent process.
 if (!process.send) {
 	var child_process = require('child_process');
+	var isTimeToDie = false;
+	var workerProcess;
 	
-	// Start the Docx worker child process. This will be reused for every 
-	// rendering job.
-	var workerProcess = child_process.fork(__filename);
-	if (!workerProcess) {
-		var err = new Error('Unable to launch DocxWorker.js');
-		console.error(err);
-		// throw err;
-	}
+	var launchWorker = function() {
+		// Start the Docx worker process. This will be reused for all 
+		// rendering jobs.
+		workerProcess = child_process.fork(__filename);
+		if (!workerProcess) {
+			var err = new Error('Unable to launch DocxWorker.js');
+			console.error(err);
+			// throw err;
+		}
+		// Re-launch worker process if it dies unexpectedly
+		workerProcess.on('exit', () => {
+			if (!isTimeToDie) {
+				console.log('DocxWorker died. Relaunching.');
+				launchWorker();
+			}
+		});
+	};
+	launchWorker();
+	
+	// Kill worker process when parent exits.
 	process.on('exit', () => {
-		workerProcess && workerProcess.kill();
+		if (workerProcess && workerProcess.connected) {
+			isTimeToDie = true;
+			workerProcess.kill();
+		}
 	});
+	
 	
 	// Used to assign worker jobID values
 	var workerJobCount = 0;
@@ -56,7 +74,7 @@ if (!process.send) {
 	 */
 	module.exports = function docxWorker(options) {
 		return new Promise((resolve, reject) => {
-			if (!workerProcess) {
+			if (!workerProcess || !workerProcess.connected) {
 				reject(new Error('DocxWorker process not available'));
 			}
 			else {
@@ -92,7 +110,6 @@ if (!process.send) {
 }
 
 
-// For fork()
 // This is the worker process.
 else {
 	var DocxGen = require('docxtemplater');
@@ -103,6 +120,8 @@ else {
 	var async = require('async');
 	var uuid = require('uuid/v1');
 	var os = require('os');
+	
+	process.title = 'DocxWorker.js';
 	
 	// Receive job from parent process
 	process.on('message', (msg) => {
@@ -193,7 +212,7 @@ else {
 				console.error('DocxWorker error:', err);
 				process.send({
 					jobID: msg.jobID,
-					// Error() objects won't pass through IPC
+					// Error() objects can't be serialized through IPC
 					error: err.message || err
 				});
 			}
