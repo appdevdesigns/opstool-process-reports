@@ -159,7 +159,7 @@ else {
 							}
 						},
 						getSize: (imgBuffer, tagValue, tagName) => {
-							if (imgBuffer) {
+							if (imgBuffer && (imgBuffer.length > 0)) {
 								// Find apsect ratio image dimensions
 								var image = sizeOf(imgBuffer);
 								var ratio = Math.min(msg.image.maxWidth / image.width, msg.image.maxHeight / image.height);
