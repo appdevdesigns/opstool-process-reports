@@ -6,29 +6,36 @@
  */
 
 // process.send() should only be available if this file was executed 
-// with child_process.fork(). If not, then this file was added with require()
-// meaning we are in the parent process.
+// with child_process.fork(). If not, then this file was added with require(),
+// which means we are in the parent process.
 
 // This is the parent process.
 if (!process.send) {
 	var child_process = require('child_process');
 	var isTimeToDie = false;
+	var numLivesRemaining = 50;
 	var workerProcess;
 	
 	var launchWorker = function() {
 		// Start the Docx worker process. This will be reused for all 
 		// rendering jobs.
-		workerProcess = child_process.fork(__filename);
+		workerProcess = child_process.fork(__filename, [], { execArgv: [] });
 		if (!workerProcess) {
 			var err = new Error('Unable to launch DocxWorker.js');
 			console.error(err);
 			// throw err;
 		}
 		// Re-launch worker process if it dies unexpectedly
-		workerProcess.on('exit', () => {
+		workerProcess.on('exit', (code) => {
 			if (!isTimeToDie) {
-				console.log('DocxWorker died. Relaunching.');
-				launchWorker();
+				if (numLivesRemaining > 0) {
+					console.log(`DocxWorker died [${code}]. Relaunching.`);
+					numLivesRemaining -= 1;
+					launchWorker();
+				}
+				else {
+					console.log('DocxWorker died too many times.');
+				}
 			}
 		});
 	};
@@ -179,7 +186,7 @@ else {
 						},
 						getSize: (imgBuffer, tagValue, tagName) => {
 							if (imgBuffer && (imgBuffer.length > 0)) {
-								// Find apsect ratio image dimensions
+								// Find aspect ratio image dimensions
 								var image = sizeOf(imgBuffer);
 								var ratio = Math.min(msg.image.maxWidth / image.width, msg.image.maxHeight / image.height);
 								
