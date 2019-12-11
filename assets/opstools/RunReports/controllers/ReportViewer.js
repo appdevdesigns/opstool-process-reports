@@ -234,7 +234,15 @@ steal(
 										}
 									});
 
-									window.location.href = reportTemplate.getDocxUrl + (filter ? '?' + filter : '');
+									var docxUrl = reportTemplate.getDocxUrl || "";
+									if (filter) {
+										if (docxUrl.indexOf("?") < 0)
+											docxUrl += '?';
+
+										docxUrl += filter;
+									}
+
+									window.location.href = docxUrl;
 								});
 
 								_this.dom.ViewWidget = new AD.op.Widget(_this.element.find('.rp-runreport-preview'));

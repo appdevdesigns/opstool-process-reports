@@ -428,7 +428,15 @@ steal(
 										}
 									});
 
-									window.location.href = _this.data.reportTemplate.getDocxUrl + (filter ? '?' + filter : '');
+									var docxUrl = _this.data.reportTemplate.getDocxUrl || "";
+									if (filter) {
+										if (docxUrl.indexOf("?") < 0)
+											docxUrl += '?';
+
+										docxUrl += filter;
+									}
+
+									window.location.href = docxUrl;
 								});
 
 								$('.rp-report-preview-loading').hide();

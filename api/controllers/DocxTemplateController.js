@@ -278,6 +278,7 @@ module.exports = {
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
 		var projectName = req.param('Project');
+		var limitImages = req.param('LimitImgs');
 
 		var startDateObj, endDateObj;
 
@@ -365,6 +366,13 @@ module.exports = {
 					});
 
 					var img = _.orderBy(img, 'sort_by', 'asc'); // Use Lodash to sort array by 'date'
+
+					// limit number of images
+					limitImages = parseInt(limitImages || 0);
+					if (limitImages > 0 &&
+						limitImages < img.length) {
+						img = img.slice(0, limitImages);
+					}
 
 					for (var i = 0; i < img.length; i += 2) {
 
