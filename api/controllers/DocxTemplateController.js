@@ -775,7 +775,7 @@ module.exports = {
 					
 					if (template == "workpermit") {
 						// return 1 page with 4 images
-						var imgs = s.images.slice(index, index + numberOfImgApage);
+						var imgs = s.images.slice(0, numberOfImgApage);
 
 						data.pages.push({
 							project_title: s.project_title || projectName || "",
