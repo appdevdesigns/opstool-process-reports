@@ -772,19 +772,34 @@ module.exports = {
 				let numberOfImgApage = 4;
 
 				staffs.forEach(s => {
-
-					// get each 5 images to a page
-					for (let index = 0; index < s.images.length; index += numberOfImgApage) {
-
+					
+					if (template == "workpermit") {
+						// return 1 page with 4 images
 						var imgs = s.images.slice(index, index + numberOfImgApage);
 
 						data.pages.push({
 							project_title: s.project_title || projectName || "",
 							person_name_en: s.person_name_en,
 							person_name: s.person_name,
+							person_work_number: s.person_work_number,
+							person_job_title: s.person_job_title,
 							images: imgs
 						});
+					} else {
+						// get each 4 images to a page
+						for (let index = 0; index < s.images.length; index += numberOfImgApage) {
 
+							var imgs = s.images.slice(index, index + numberOfImgApage);
+
+							data.pages.push({
+								project_title: s.project_title || projectName || "",
+								person_name_en: s.person_name_en,
+								person_name: s.person_name,
+								images: imgs
+							});
+
+						}
+	
 					}
 
 
