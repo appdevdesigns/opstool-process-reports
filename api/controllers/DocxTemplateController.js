@@ -863,7 +863,276 @@ module.exports = {
 			}
 		});
 
-	}
+	},
 
+	// /opstool-process-reports/docxtemplate/activity_list
+	activity_list: function (req, res, options) {
+
+		AD.log('<green>::: docxtemplate.activity_list() :::</green>');
+
+		options = options || {};
+
+		/**
+		 * {
+		 * 		staffs: [
+		 * 			person_name: 'string',
+		 * 			start_date: 'string',
+		 * 			end_date: 'string,
+		 * 			list: [
+		 * 				date: 'string',
+		 * 				localtion: 'string',
+		 * 				caption: 'string',
+		 * 				project_title: 'string'
+		 * 			]
+		 * 		]
+		 * }
+		 */
+		var data = {
+			staffs: []
+		};
+		var staffs;
+		var activities;
+		var activity_images;
+		var tempFile = {};
+
+		var staffName = req.param('memberName');
+		var startDate = req.param('Start date');
+		var endDate = req.param('End date');
+		var projectName = req.param('Project');
+
+		var startDateObj, endDateObj;
+
+		async.series([
+
+			// Get data
+			function (next) {
+				async.parallel([
+					// Get staffs data
+					function (callback) {
+
+						renderReportController.staffs(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									staffs = r.data;
+								}
+
+								callback();
+							}
+						});
+
+					},
+					// Get activities data
+					function (callback) {
+						renderReportController.activities(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success')
+									activities = r.data;
+
+								callback();
+							}
+						});
+					},
+					// Get activity images data
+					function (callback) {
+
+						renderReportController.activity_images(req, {
+							send: function (result, code) {
+								var r = JSON.parse(result);
+								if (r.status === 'success') {
+									activity_images = r.data;
+								}
+
+								callback();
+							}
+						});
+
+					}
+				], function (err) {
+					next(err);
+				});
+			},
+
+
+			// filter
+			function (next) {
+
+				// filter staffs
+				if (staffName) {
+					staffName = staffName.trim();
+
+					_.remove(staffs, function (s) {
+						return s.person_name_en.trim().indexOf(staffName) < 0;
+					});
+				}
+
+				// filter date
+				if (startDate) {
+					startDateObj = moment(startDate, 'M/D/YY', 'en');
+				}
+
+				if (endDate) {
+					endDateObj = moment(endDate, 'M/D/YY', 'en');
+				}
+
+				_.remove(activity_images, function (img) {
+
+					var dateMoment = moment(img.image_date);
+
+					// date format
+					img.image_date = dateMoment.format('DD/MM/YYYY');
+
+					if (startDateObj != null && (dateMoment < startDateObj)) {
+						return true;
+					}
+					else if (endDateObj != null && (dateMoment > endDateObj)) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				});
+
+
+				// Project name filter
+				if (projectName) {
+					projectName = projectName.trim();
+
+					_.remove(activities, function (a) {
+						return (a.project_name || '').trim() != projectName && 
+								(a.project_name_nat || '').trim() != projectName;
+					});
+				}
+
+				// Activity images filter
+				_.remove(activity_images, function (img) {
+					if (activities.filter(function (act) { return act.activity_id == img.activity_id; }).length < 1)
+						return true;
+					else
+						return false;
+				});
+
+
+				next();
+			},
+
+			// subtract image fields
+			function (next) {
+
+				activity_images = activity_images.map(img => {
+					return {
+						date: img.image_date,
+						caption: img.image_caption,
+						location: img.image_caption_govt,
+
+						person_id: img.person_id
+					};
+				});
+
+				next();
+			},
+
+			// pull images of staffs
+			function (next) {
+
+				staffs.forEach(s => {
+
+					s.images = (activity_images.filter(img => img.person_id == s.person_id) || []);
+
+					// sorting 
+					s.images.sort((a, b) => moment(a.date, 'DD/MM/YYYY').diff(moment(b.date, 'DD/MM/YYYY')) );
+				});
+
+				// if no images,
+				_.remove(staffs, function (s) {
+					return s.images.length < 1;
+				});
+
+				next();
+			},
+
+
+			// prepare data to report
+			function (next) {
+
+				var strStartDate = "";
+				var strEndDate = "";
+
+				if (startDateObj)
+					strStartDate = startDateObj.format('DD/MM/YYYY');
+
+				if (endDateObj)
+					strEndDate = endDateObj.format('DD/MM/YYYY');
+
+				staffs.forEach(s => {
+
+					let staffData = {
+						person_name: s.person_name,
+						start_date: strStartDate,
+						end_date: strEndDate,
+						list: []
+					};
+
+					s.images.forEach(img => {
+						staffData.list.push({
+							date: img.date,
+							location: img.location,
+							caption: img.caption,
+							project_title: s.project_title || projectName || ""
+						});
+					});
+
+					data.staffs.push(staffData);
+
+				});
+
+				next();
+			},
+
+			// Generate docx file
+			function (next) {
+				docxWorker({
+					templateFile: __dirname + "/../../docx templates/activity list.docx",
+					data: data
+				})
+				.then((result) => {
+					tempFile = result;
+					next();
+				})
+				.catch(next);
+			}
+
+
+		], function (err, r) {
+
+			if (err) {
+
+				ADCore.comm.error(res, err, 500);
+			} else {
+
+				AD.log('<green>::: end docxtemplate.activity_list() :::</green>');
+
+				res.set({
+					"Content-Disposition": 'attachment; filename="' + 'activity list.docx' + '"',
+					"Content-Type": 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+					"Content-Length": tempFile.length
+				});
+				
+				// Stream file to client
+				// (no need to read entire file into memory first)
+				var stream = fs.createReadStream(tempFile.name);
+				stream.pipe(res);
+				stream.on('end', () => {
+					// Clean up temp file
+					fs.unlink(tempFile.name, (err) => {
+						if (err) sails.log.error(err);
+					});
+				});
+				
+			}
+		});
+
+	}
 
 };
