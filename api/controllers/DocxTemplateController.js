@@ -610,6 +610,7 @@ module.exports = {
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
 		var projectName = req.param('Project');
+		var template = req.param('template');
 
 		var startDateObj, endDateObj;
 
@@ -795,8 +796,13 @@ module.exports = {
 
 			// Generate docx file
 			function (next) {
+				var docx = "/../../docx templates/activity image list template.docx";
+				if (template == "workpermit") {
+					docx = "/../../docx templates/images work permit template.docx"
+				}
+					
 				docxWorker({
-					templateFile: __dirname + "/../../docx templates/activity image list template.docx",
+					templateFile: __dirname + docx,
 					data: data,
 					image: {
 						path: options.imagePath || __dirname + '/../../../../assets/data/fcf/images/activities/',
