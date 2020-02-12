@@ -895,7 +895,7 @@ module.exports = {
 		var activity_images;
 		var tempFile = {};
 
-		var staffName = req.param('memberName');
+		var staffName = req.param('Member Name');
 		var startDate = req.param('Start date');
 		var endDate = req.param('End date');
 		var projectName = req.param('Project');
