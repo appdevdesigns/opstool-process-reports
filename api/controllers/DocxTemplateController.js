@@ -1067,15 +1067,25 @@ module.exports = {
 
 				staffs.forEach(s => {
 
-					let staffData = {
+					let staff = {
 						person_name: s.person_name,
 						start_date: strStartDate,
 						end_date: strEndDate,
-						list: []
+						pages: []
 					};
+					let page;
 
-					s.images.forEach(img => {
-						staffData.list.push({
+					s.images.forEach((img, imgIndex) => {
+
+						if (imgIndex % 4 == 0) {
+							page = {
+								list: []
+							};
+
+							staff.pages.push(page);
+						}
+
+						page.list.push({
 							date: img.date,
 							location: img.location,
 							caption: img.caption,
@@ -1083,7 +1093,7 @@ module.exports = {
 						});
 					});
 
-					data.staffs.push(staffData);
+					data.staffs.push(staff);
 
 				});
 
